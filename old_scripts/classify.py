@@ -70,7 +70,7 @@ def main(argv):
     log['time'] = timer.elapsed()
 
     results = [dict(log, accuracy=acc) for acc in accuracy]
-    log_results(results)
+    # log_results(results)
     save_results(results, argv[6])
 
 
