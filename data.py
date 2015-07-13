@@ -3,7 +3,7 @@ import os
 import cPickle as pickle
 import pandas as pd
 
-data_path = './bucket/data/'
+data_path = './bucket/data/mdd/'
 pickled_path = data_path + 'pickled/'
 mdd_rma_pickled_file = 'rma.pickle'
 mdd_target_pickled_file = 'mdd_target.pickle'
