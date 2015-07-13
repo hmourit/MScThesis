@@ -12,24 +12,24 @@ from sklearn.cross_validation import cross_val_score
 from utils_2 import load_data, log_results
 from utils_2 import Timer
 
-rma, drug, stress = load_data()
 
-alpha_range = np.logspace(-2, 7, 10)
-l1_ratio_range = np.arange(0., 1., 0.1)
-en_param_grid = dict(alpha=alpha_range, l1_ratio=l1_ratio_range)
+def main(argv):
 
-C_range = np.logspace(-2, 7, 10)
-gamma_range = np.logspace(-6, 3, 10)
-svm_param_grid = dict(gamma=gamma_range, C=C_range)
+    rma, drug, stress = load_data()
 
-if __name__ == '__main__':
+    alpha_range = np.logspace(-2, 7, 10)
+    l1_ratio_range = np.arange(0., 1., 0.1)
+    en_param_grid = dict(alpha=alpha_range, l1_ratio=l1_ratio_range)
 
-    test_size = float(sys.argv[1])
-    n_iter = int(sys.argv[2])
-    n_folds = int(sys.argv[3])
-    target = sys.argv[4]
-    classifier = sys.argv[5]
+    c_range = np.logspace(-2, 7, 10)
+    gamma_range = np.logspace(-6, 3, 10)
+    svm_param_grid = dict(gamma=gamma_range, C=c_range)
 
+    test_size = float(argv[1])
+    n_iter = int(argv[2])
+    n_folds = int(argv[3])
+    target = argv[4]
+    classifier = argv[5]
     log = {
         'target': target,
         'split': {
@@ -41,12 +41,10 @@ if __name__ == '__main__':
         'classifier': classifier
 
     }
-
     if target == 'drug':
         target = drug
     else:
         target = stress
-
     if classifier == 'svm':
         clf = SVC()
         param_grid = svm_param_grid
@@ -57,14 +55,20 @@ if __name__ == '__main__':
     timer = Timer()
     print('Starting...')
     pprint(log)
-
     split = StratifiedShuffleSplit(target['str'], n_iter=n_iter, test_size=test_size)
     grid = GridSearchCV(clf, param_grid=param_grid, cv=n_folds, n_jobs=1)
     accuracy = cross_val_score(grid, rma, y=target['str'], scoring='accuracy', cv=split,
                                n_jobs=n_iter, verbose=1)
     print('\n{}: Accuracy: {:.2%} +/- {:.2%}'.format(timer.elapsed(), np.nanmean(accuracy),
                                                      np.nanstd(accuracy)))
+    # log['results'] = {'accuracy': {'mean': accuracy.mean(), 'std': accuracy.std()},
+    #                   'time': timer.elapsed()}
+    log['time'] = timer.elapsed()
 
-    log['results'] = {'accuracy': {'mean': accuracy.mean(), 'std': accuracy.std()},
-                      'time': timer.elapsed()}
-    log_results(log)
+    results = [dict(log, accuracy=acc) for acc in accuracy]
+    log_results(results)
+
+
+
+if __name__ == '__main__':
+    main(sys.argv)
