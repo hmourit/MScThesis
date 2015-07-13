@@ -2,6 +2,7 @@ import numpy as np
 
 from sklearn.cross_validation import StratifiedKFold, StratifiedShuffleSplit
 from sklearn.grid_search import GridSearchCV
+from sklearn.preprocessing import data
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from datetime import datetime
@@ -11,11 +12,14 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.cross_validation import cross_val_score
 from utils_2 import load_data, log_results
 from utils_2 import Timer
+from results import save_results
+import data
 
 
 def main(argv):
 
     rma, drug, stress = load_data()
+    rma, target = data.load_mdd_data()
 
     alpha_range = np.logspace(-2, 7, 10)
     l1_ratio_range = np.arange(0., 1., 0.1)
@@ -67,6 +71,7 @@ def main(argv):
 
     results = [dict(log, accuracy=acc) for acc in accuracy]
     log_results(results)
+    save_results(results, argv[6])
 
 
 

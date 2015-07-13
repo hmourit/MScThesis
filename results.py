@@ -3,6 +3,9 @@ import json
 
 
 def save_results(results, folder='../', filename='results.json'):
+    experiment_id = hash(json.dumps(results))
+    for result in results:
+        result['experiment_id'] = experiment_id
     with open(folder + filename, 'r') as in_:
         previous_results = json.load(in_)
     with open(folder + filename, 'w') as out:
