@@ -18,8 +18,8 @@ import data
 
 def main(argv):
 
-    rma, drug, stress = load_data()
-    rma, target = data.load_mdd_data()
+    # rma, drug, stress = load_data()
+    rma, label = data.load_mdd_data()
 
     alpha_range = np.logspace(-2, 7, 10)
     l1_ratio_range = np.arange(0., 1., 0.1)
@@ -45,10 +45,10 @@ def main(argv):
         'classifier': classifier
 
     }
-    if target == 'drug':
-        target = drug
-    else:
-        target = stress
+    # if target == 'drug':
+    #     target = drug
+    # else:
+    #     target = stress
     if classifier == 'svm':
         clf = SVC()
         param_grid = svm_param_grid
@@ -59,9 +59,9 @@ def main(argv):
     timer = Timer()
     print('Starting...')
     pprint(log)
-    split = StratifiedShuffleSplit(target['str'], n_iter=n_iter, test_size=test_size)
+    split = StratifiedShuffleSplit(label[target], n_iter=n_iter, test_size=test_size)
     grid = GridSearchCV(clf, param_grid=param_grid, cv=n_folds, n_jobs=1)
-    accuracy = cross_val_score(grid, rma, y=target['str'], scoring='accuracy', cv=split,
+    accuracy = cross_val_score(grid, rma, y=label[target], scoring='accuracy', cv=split,
                                n_jobs=n_iter, verbose=1)
     print('\n{}: Accuracy: {:.2%} +/- {:.2%}'.format(timer.elapsed(), np.nanmean(accuracy),
                                                      np.nanstd(accuracy)))
