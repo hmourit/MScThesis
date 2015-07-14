@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.cross_validation import StratifiedKFold, StratifiedShuffleSplit
 from sklearn.decomposition import PCA
 from sklearn.grid_search import GridSearchCV
+from sklearn.linear_model.logistic import LogisticRegressionCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import data
 from sklearn.svm import SVC
@@ -24,11 +25,11 @@ def main(argv):
 
     alpha_range = np.logspace(-2, 7, 10)
     l1_ratio_range = np.arange(0., 1., 0.1)
-    en_param_grid = dict(clf__alpha=alpha_range, clf__l1_ratio=l1_ratio_range)
+    en_param_grid = dict(alpha=alpha_range, l1_ratio=l1_ratio_range)
 
     c_range = np.logspace(-2, 7, 10)
     gamma_range = np.logspace(-6, 3, 10)
-    svm_param_grid = dict(clf__gamma=gamma_range, clf__C=c_range)
+    svm_param_grid = dict(gamma=gamma_range, C=c_range)
 
     test_size = float(argv[1])
     n_iter = int(argv[2])
@@ -58,18 +59,26 @@ def main(argv):
     if classifier == 'svm':
         clf = SVC()
         param_grid = svm_param_grid
+        grid_search = True
     elif classifier == 'en':
         clf = SGDClassifier(loss='log', penalty='elasticnet', n_jobs=1)
         param_grid = en_param_grid
-
-    pipeline = Pipeline([('pca', pca), ('clf', clf)])
+        grid_search = True
+    elif classifier == 'logit':
+        clf = LogisticRegressionCV()
+        grid_search = False
 
     timer = Timer()
     print('\nStarting...' + ' '.join(argv))
     pprint(log)
     split = StratifiedShuffleSplit(label[target], n_iter=n_iter, test_size=test_size)
-    grid = GridSearchCV(pipeline, param_grid=param_grid, cv=n_folds, n_jobs=1)
-    accuracy = cross_val_score(grid, rma, y=label[target], scoring='accuracy', cv=split,
+
+    if grid_search:
+        clf = GridSearchCV(clf, param_grid=param_grid, cv=n_folds, n_jobs=1)
+
+    pipeline = Pipeline([('pca', pca), ('clf', clf)])
+
+    accuracy = cross_val_score(pipeline, rma, y=label[target], scoring='accuracy', cv=split,
                                n_jobs=n_iter, verbose=1)
     print('\n{}: Accuracy: {:.2%} +/- {:.2%}'.format(timer.elapsed(), np.nanmean(accuracy),
                                                      np.nanstd(accuracy)))
