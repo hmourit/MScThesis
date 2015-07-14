@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.cross_validation import StratifiedKFold, StratifiedShuffleSplit
 from sklearn.decomposition import PCA
 from sklearn.grid_search import GridSearchCV
-from sklearn.linear_model.logistic import LogisticRegressionCV
+from sklearn.linear_model.logistic import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import data
 from sklearn.svm import SVC
@@ -30,6 +30,8 @@ def main(argv):
     c_range = np.logspace(-2, 7, 10)
     gamma_range = np.logspace(-6, 3, 10)
     svm_param_grid = dict(gamma=gamma_range, C=c_range)
+
+    logit_param_grid = dict(C=c_range)
 
     test_size = float(argv[1])
     n_iter = int(argv[2])
@@ -65,8 +67,9 @@ def main(argv):
         param_grid = en_param_grid
         grid_search = True
     elif classifier == 'logit':
-        clf = LogisticRegressionCV()
-        grid_search = False
+        clf = LogisticRegression()
+        param_grid = logit_param_grid
+        grid_search = True
 
     timer = Timer()
     print('\nStarting...' + ' '.join(argv))
