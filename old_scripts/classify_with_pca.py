@@ -1,0 +1,86 @@
+import numpy as np
+
+from sklearn.cross_validation import StratifiedKFold, StratifiedShuffleSplit
+from sklearn.decomposition import PCA
+from sklearn.grid_search import GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import data
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
+from datetime import datetime
+import sys
+from pprint import pprint
+from sklearn.linear_model import SGDClassifier
+from sklearn.cross_validation import cross_val_score
+from utils_2 import load_data, log_results
+from utils_2 import Timer
+from results import save_results
+import data
+
+
+def main(argv):
+    # rma, drug, stress = load_data()
+    rma, label = data.load_mdd_data()
+
+    alpha_range = np.logspace(-2, 7, 10)
+    l1_ratio_range = np.arange(0., 1., 0.1)
+    en_param_grid = dict(clf__alpha=alpha_range, clf__l1_ratio=l1_ratio_range)
+
+    c_range = np.logspace(-2, 7, 10)
+    gamma_range = np.logspace(-6, 3, 10)
+    svm_param_grid = dict(clf__gamma=gamma_range, clf__C=c_range)
+
+    test_size = float(argv[1])
+    n_iter = int(argv[2])
+    n_folds = int(argv[3])
+    target = argv[4]
+    classifier = argv[5]
+    pca_components = int(argv[7])
+    log = {
+        'target': target,
+        'pca': {'n_components': pca_components},
+        'split': {
+            'type': 'StratifiedShuffleSplit',
+            'n_iter': n_iter,
+            'test_size': test_size
+        },
+        'cross_val': {'n_folds': n_folds},
+        'classifier': classifier
+
+    }
+    # if target == 'drug':
+    #     target = drug
+    # else:
+    #     target = stress
+
+    pca = PCA(n_components=pca_components)
+
+    if classifier == 'svm':
+        clf = SVC()
+        param_grid = svm_param_grid
+    elif classifier == 'en':
+        clf = SGDClassifier(loss='log', penalty='elasticnet', n_jobs=1)
+        param_grid = en_param_grid
+
+    pipeline = Pipeline([('pca', pca), ('clf', clf)])
+
+    timer = Timer()
+    print('\nStarting...' + ' '.join(argv))
+    pprint(log)
+    split = StratifiedShuffleSplit(label[target], n_iter=n_iter, test_size=test_size)
+    grid = GridSearchCV(pipeline, param_grid=param_grid, cv=n_folds, n_jobs=1)
+    accuracy = cross_val_score(grid, rma, y=label[target], scoring='accuracy', cv=split,
+                               n_jobs=n_iter, verbose=1)
+    print('\n{}: Accuracy: {:.2%} +/- {:.2%}'.format(timer.elapsed(), np.nanmean(accuracy),
+                                                     np.nanstd(accuracy)))
+    # log['results'] = {'accuracy': {'mean': accuracy.mean(), 'std': accuracy.std()},
+    #                   'time': timer.elapsed()}
+    log['time'] = timer.elapsed()
+
+    results = [dict(log, accuracy=acc) for acc in accuracy]
+    # log_results(results)
+    save_results(results, folder=argv[6], filename='results_new.json')
+
+
+if __name__ == '__main__':
+    main(sys.argv)
