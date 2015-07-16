@@ -22,7 +22,7 @@ class SelectStd(object):
         self.n_features_ = n_features
 
     def fit(self, X, y=None):
-        print(type(X))
+        print(type(X), X.shape)
         raw_input('/////////////////////////////////')
         stds = X.std()
         stds.sort(ascending=False)
