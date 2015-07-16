@@ -15,7 +15,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.cross_validation import cross_val_score
 from utils_2 import load_data, log_results
 from utils_2 import Timer
-from results import save_results
+from results import save_results, save_experiment
 import data
 
 
@@ -85,14 +85,20 @@ def main(argv):
                                n_jobs=n_iter, verbose=1)
     print('\n{}: Accuracy: {:.2%} +/- {:.2%}'.format(timer.elapsed(), np.nanmean(accuracy),
                                                      np.nanstd(accuracy)))
-    # log['results'] = {'accuracy': {'mean': accuracy.mean(), 'std': accuracy.std()},
-    #                   'time': timer.elapsed()}
+
+    log['results'] = {
+        'accuracy': {
+            'scores': accuracy.tolist(),
+            'mean': accuracy.mean(),
+            'std': accuracy.std()
+        }
+    }
     log['time'] = timer.elapsed()
 
-    results = [dict(log, accuracy=acc) for acc in accuracy]
+    # results = [dict(log, accuracy=acc) for acc in accuracy]
     # log_results(results)
-    save_results(results, folder=argv[6], filename='results_new.json')
-
+    # save_results(results, folder=argv[6], filename='results_new.json')
+    save_experiment(log, folder=argv[6])
 
 if __name__ == '__main__':
     main(sys.argv)
