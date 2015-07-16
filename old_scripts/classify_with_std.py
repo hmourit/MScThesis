@@ -95,7 +95,7 @@ def main(argv):
     pipeline = Pipeline([('pca', pca), ('clf', clf)])
 
     accuracy = cross_val_score(pipeline, rma, y=label[target], scoring='accuracy', cv=split,
-                               n_jobs=1, verbose=1)
+                               n_jobs=n_iter, verbose=1)
     print('\n{}: Accuracy: {:.2%} +/- {:.2%}'.format(timer.elapsed(), np.nanmean(accuracy),
                                                      np.nanstd(accuracy)))
 
