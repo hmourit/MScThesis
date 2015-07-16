@@ -17,6 +17,7 @@ def save_results(results, folder='../', filename='results.json'):
 
 def save_experiment(results, folder='../', filename='result_{}.json'):
     experiment_id = hash(json.dumps(results))
+    print('Experiment id:', experiment_id)
     results['experiment_id'] = experiment_id
     with open(folder + filename.format(experiment_id), 'w') as out:
         json.dump(results, out, sort_keys=True, indent=2, separators=(',', ': '))

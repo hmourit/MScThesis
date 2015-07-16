@@ -2,6 +2,7 @@ import sys
 from pprint import pprint
 
 import numpy as np
+from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.cross_validation import StratifiedShuffleSplit
 from sklearn.decomposition import PCA
 from sklearn.grid_search import GridSearchCV
@@ -14,6 +15,20 @@ from sklearn.cross_validation import cross_val_score
 from utils_2 import Timer
 from results import save_experiment
 import data
+
+
+class SelectStd(object):
+    def __init__(self, n_features=1):
+        self.n_features_ = n_features
+
+    def fit(self, X, y=None):
+        stds = X.std()
+        stds.sort(ascending=False)
+        self.select_ = stds.index[:self.n_features_]
+        return self
+
+    def transform(self, X):
+        return X[self.select_]
 
 
 def main(argv):
@@ -38,7 +53,7 @@ def main(argv):
     pca_components = int(argv[7])
     log = {
         'target': target,
-        'pca': {'n_components': pca_components},
+        'std_select': {'n_feat': pca_components},
         'split': {
             'type': 'StratifiedShuffleSplit',
             'n_iter': n_iter,
@@ -53,7 +68,8 @@ def main(argv):
     # else:
     #     target = stress
 
-    pca = PCA(n_components=pca_components)
+    # pca = PCA(n_components=pca_components)
+    pca = SelectStd(n_features=pca_components)
 
     if classifier == 'svm':
         clf = SVC()
@@ -95,7 +111,7 @@ def main(argv):
     # results = [dict(log, accuracy=acc) for acc in accuracy]
     # log_results(results)
     # save_results(results, folder=argv[6], filename='results_new.json')
-    save_experiment(log, folder=argv[6])
+    # save_experiment(log, folder=argv[6])
 
 if __name__ == '__main__':
     main(sys.argv)
