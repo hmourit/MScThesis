@@ -111,7 +111,7 @@ def main(argv):
     # results = [dict(log, accuracy=acc) for acc in accuracy]
     # log_results(results)
     # save_results(results, folder=argv[6], filename='results_new.json')
-    # save_experiment(log, folder=argv[6])
+    save_experiment(log, folder=argv[6])
 
 if __name__ == '__main__':
     main(sys.argv)
