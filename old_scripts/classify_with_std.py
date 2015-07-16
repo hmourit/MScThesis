@@ -22,9 +22,9 @@ class SelectStd(object):
         self.n_features_ = n_features
 
     def fit(self, X, y=None):
-        stds = X.std()
-        print(type(stds))
+        print(type(X))
         raw_input('/////////////////////////////////')
+        stds = X.std()
         stds.sort(ascending=False)
         self.select_ = stds.index[:self.n_features_]
         return self
