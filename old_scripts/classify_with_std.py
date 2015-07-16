@@ -23,8 +23,8 @@ class SelectStd(object):
 
     def fit(self, X, y=None):
         print(type(X), X.shape)
-        raw_input('/////////////////////////////////')
         stds = X.std()
+        print(type(stds))
         stds.sort(ascending=False)
         self.select_ = stds.index[:self.n_features_]
         return self
