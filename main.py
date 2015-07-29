@@ -1,6 +1,6 @@
 from __future__ import division, print_function
 import sys
-from old_scripts import classify, classify_with_pca, classify_with_std
+from scripts import classify, classify_with_pca, classify_with_std
 
 
 def main(argv):

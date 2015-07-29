@@ -135,3 +135,36 @@ def compact_results(
 
     _write_block(current_block, results, verbose)
     _zip_and_remove(to_remove, results_path, zipped_file, verbose)
+
+
+def apply_transformation(result_files, transform, verbose=False):
+
+    if isinstance(result_files, str):
+        if '*' in result_files or '?' in result_files:
+            result_files = glob(result_files)
+        else:
+            result_files = [result_files]
+
+    for file_ in result_files:
+        if verbose:
+            print('*** {}'.format(os.path.basename(file_)))
+        results = json.load(open(file_, 'r'))
+        if isinstance(results, dict):
+            results = [results]
+
+        modified = 0
+        total = 0
+        for experiment in results:
+            total += 1
+            if transform(experiment):
+                modified += 1
+
+        if verbose:
+            print('{}/{} experiments modified.'.format(modified, total))
+
+        if modified > 0:
+            if len(results) == 1:
+                results = results[0]
+
+            with open(file_, 'w') as out:
+                json.dump(results, out)
