@@ -1,6 +1,8 @@
 from __future__ import division, print_function
-import glob
+from glob import glob
 import json
+import os
+import zipfile
 import pandas as pd
 
 
@@ -52,5 +54,84 @@ def flatten_json(data, record_path=None):
 
 
 def read_results(files, record_path=None):
-    results = [json.load(open(f, 'r')) for f in glob.glob(files)]
+    results = [json.load(open(f, 'r')) for f in glob(files)]
     return pd.DataFrame(flatten_json(results, record_path=record_path))
+
+
+def compact_results(
+        results_path='./results',
+        result_file='result_*.json',
+        block_file='results_block_*.json',
+        zipped_file='zipped_results.zip',
+        max_block_size=1,
+        verbose=False):
+
+    def _zip_and_remove(to_remove, results_path, zipped_file, verbose):
+        for f in to_remove:
+            if verbose:
+                print('Adding {} to {} and removing.'
+                      .format(os.path.basename(f), zipped_file))
+            with zipfile.ZipFile(os.path.join(results_path, zipped_file), 'a') as z:
+                z.write(f)
+            os.remove(f)
+
+    def _select_block(results_path, block_file, max_block_size):
+        blocks = sorted(glob(os.path.join(results_path, block_file)))
+
+        if len(blocks) > 0:
+            current_block = blocks[-1]
+            block_size = os.path.getsize(current_block)
+        else:
+            current_block = ''
+            block_size = max_block_size * 1024 * 1024 + 1
+
+        if block_size / 1024 / 1024 > max_block_size:
+            new_block_name = block_file.replace('*', '{:04d}'.format(len(blocks)))
+            current_block = os.path.join(results_path, new_block_name)
+            block_size = 0
+            results = []
+            if verbose:
+                msg = 'Starting new block: {}'.format(os.path.basename(current_block))
+                print('{fill:{fill}^{len}}\n{0}\n{fill:{fill}^{len}}'
+                      .format(msg, fill='-', len=len(msg)))
+        else:
+            with open(current_block, 'r') as in_:
+                results = json.load(in_)
+            if verbose:
+                msg = 'Continuing block: {}'.format(os.path.basename(current_block))
+                print('{fill:{fill}^{len}}\n{0}\n{fill:{fill}^{len}}'
+                      .format(msg, fill='-', len=len(msg)))
+
+        return current_block, results, block_size
+
+    def _write_block(block, results, verbose):
+        with open(block, 'w') as out:
+            json.dump(results, out, sort_keys=True, indent=2, separators=(',', ': '))
+        if verbose:
+            msg = 'Writing block: {}'.format(os.path.basename(block))
+            print('{fill:{fill}^{len}}\n{0}\n{fill:{fill}^{len}}'
+                  .format(msg, fill='-', len=len(msg)))
+
+    current_block, results, block_size = _select_block(results_path, block_file, max_block_size)
+    to_remove = []
+    for f in glob(os.path.join(results_path, result_file)):
+        if verbose:
+            print('Adding file: {}'.format(os.path.basename(f)))
+        block_size += os.path.getsize(f)
+        with open(f, 'r') as in_:
+            experiment = json.load(in_)
+        if isinstance(experiment, dict):
+            experiment = [experiment]
+        results.extend(experiment)
+        to_remove.append(f)
+
+        if block_size / 1024 / 1024 > max_block_size:
+            _write_block(current_block, results, verbose)
+            print(zipped_file)
+            _zip_and_remove(to_remove, results_path, zipped_file, verbose)
+            to_remove = []
+            current_block, results, block_size = _select_block(results_path, block_file,
+                                                               max_block_size)
+
+    _write_block(current_block, results, verbose)
+    _zip_and_remove(to_remove, results_path, zipped_file, verbose)
