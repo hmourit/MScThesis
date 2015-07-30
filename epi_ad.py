@@ -59,8 +59,8 @@ if __name__ == '__main__':
     if args.clf == 'logit':
         pass
     elif args.clf == 'en':
-        alpha_range = np.logspace(-2, 7, 2)  # 10
-        l1_ratio_range = np.arange(0., 1., 2)  # .1
+        alpha_range = np.logspace(-2, 7, 10)  # 10
+        l1_ratio_range = np.arange(0., 1., 10)  # .1
         param_grid = dict(alpha=alpha_range, l1_ratio=l1_ratio_range)
         clf = SGDClassifier(loss='log', penalty='elasticnet')
         grid = GridSearchCV(clf, param_grid=param_grid, cv=args.n_folds)
