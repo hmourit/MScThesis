@@ -19,5 +19,6 @@ def main():
         compact_results(results_path=args.results, verbose=True)
 
 
+
 if __name__ == '__main__':
     main()

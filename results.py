@@ -17,12 +17,18 @@ def save_results(results, folder='../', filename='results.json'):
         json.dump(previous_results, out, sort_keys=True, indent=2, separators=(',', ': '))
 
 
-def save_experiment(results, folder='../', filename='result_{}.json'):
+def save_experiment(results, folder='../', filename='result_{}.json', verbose=False, error=False):
     experiment_id = hash(json.dumps(results))
-    print('Experiment id:', experiment_id)
+    if verbose:
+        print('Experiment id:', experiment_id)
     results['experiment_id'] = experiment_id
-    with open(folder + filename.format(experiment_id), 'w') as out:
-        json.dump(results, out, sort_keys=True, indent=2, separators=(',', ': '))
+    if filename is not None:
+        if error:
+            filename = 'error_' + filename
+        with open(os.path.join(folder, filename.format(experiment_id)), 'w') as out:
+            json.dump(results, out, sort_keys=True, indent=2, separators=(',', ': '))
+    else:
+        print(json.dumps(results, sort_keys=True, indent=2, separators=(',', ': ')))
 
 
 def flatten_json(data, record_path=None):
