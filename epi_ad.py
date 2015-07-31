@@ -67,6 +67,8 @@ if __name__ == '__main__':
         pipeline.append(('en', grid))
     else:
         result['error'] = '{} is not a valid classifier.'.format(args.clf)
+        save_experiment(result, folder=args.results_path, filename=None, error=True,
+                        verbose=args.verbose)
 
     pipeline = Pipeline(pipeline)
 
