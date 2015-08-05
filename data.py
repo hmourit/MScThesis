@@ -37,11 +37,13 @@ def load_mdd_data(
         mdd_rma_pickled_file='rma.pickle',
         mdd_target_pickled_file='mdd_target.pickle',
         log=None,
-        verbose=False):
+        verbose=False,
+        override_pickle=False):
     rma_pickled_full_path = os.path.join(data_path, pickled_folder, mdd_rma_pickled_file)
     target_pickled_full_path = os.path.join(data_path, pickled_folder, mdd_target_pickled_file)
-    if not os.path.isfile(rma_pickled_full_path) \
-            or not os.path.isfile(target_pickled_full_path):
+    if (override_pickle or
+            not os.path.isfile(rma_pickled_full_path) or
+            not os.path.isfile(target_pickled_full_path)):
         if verbose:
             print('Pickled data not found, loading and pickling...')
         data, target = _load_and_pickle_mdd_data(data_path,
