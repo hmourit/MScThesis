@@ -15,4 +15,4 @@ if __name__ == '__main__':
 
     discr = ExpressionDiscretizer().fit(data).transform(data)
 
-    feats = mrmr_pool(discr, y, select=discr.shape[1], pool_size=100, bins=3, verbose=True)
+    feats = mrmr_pool(discr, y, select=10, pool_size=100, bins=3, verbose=True)
