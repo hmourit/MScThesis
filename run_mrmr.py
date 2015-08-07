@@ -14,6 +14,9 @@ if __name__ == '__main__':
     parser.add_argument('--target')
     args = parser.parse_args()
 
+    print('Data: {}'.format(args.data))
+    print('Target: {}'.format(args.target))
+
     data, factors = load(args.data)
 
     y = factors[args.target]
