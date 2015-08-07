@@ -1,18 +1,24 @@
 from __future__ import division, print_function
+import argparse
 
-from data import load_mdd_data
+from data2 import load
+from sklearn.preprocessing import LabelEncoder
+from feature_selection import mrmr
+from preprocessing.discretization import ExpressionDiscretizer
 
 if __name__ == '__main__':
-    data, factors = load_mdd_data()
 
-    from sklearn.preprocessing import LabelEncoder
+    parser = argparse.ArgumentParser()
+    parser.add_argument('results_path')
+    parser.add_argument('--data')
+    parser.add_argument('--target')
+    args = parser.parse_args()
 
-    y = factors['stress']
+    data, factors = load(args.data)
+
+    y = factors[args.target]
     y = LabelEncoder().fit_transform(y)
-
-    from feature_selection import mrmr_pool
-    from preprocessing.discretization import ExpressionDiscretizer
 
     discr = ExpressionDiscretizer().fit(data).transform(data)
 
-    feats = mrmr_pool(discr, y, select=10, pool_size=100, bins=3, verbose=True)
+    feats = mrmr(discr, y, select=10, bins=3, verbose=True)

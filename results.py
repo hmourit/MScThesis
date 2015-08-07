@@ -5,6 +5,7 @@ import os
 import zipfile
 import pandas as pd
 
+RESULTS_FOLDER = './bucket/results'
 
 def save_results(results, folder='../', filename='results.json'):
     experiment_id = hash(json.dumps(results))
@@ -18,6 +19,22 @@ def save_results(results, folder='../', filename='results.json'):
 
 
 def save_experiment(results, folder='../', filename='result_{}.json', verbose=False, error=False):
+    experiment_id = hash(json.dumps(results))
+    if verbose:
+        print('Experiment id:', experiment_id)
+    results['experiment_id'] = experiment_id
+    if filename is not None:
+        if error:
+            filename = 'error_' + filename
+        with open(os.path.join(folder, filename.format(experiment_id)), 'w') as out:
+            json.dump(results, out, sort_keys=True, indent=2, separators=(',', ': '))
+    else:
+        print(json.dumps(results, sort_keys=True, indent=2, separators=(',', ': ')))
+
+
+def save_experiment2(results,
+                     folder='../', filename='result_{}.json', verbose=False,
+                    error=False):
     experiment_id = hash(json.dumps(results))
     if verbose:
         print('Experiment id:', experiment_id)
