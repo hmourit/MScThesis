@@ -9,7 +9,6 @@ from preprocessing.discretization import ExpressionDiscretizer
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('results_path')
     parser.add_argument('--data')
     parser.add_argument('--target')
     args = parser.parse_args()
