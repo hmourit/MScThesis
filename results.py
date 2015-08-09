@@ -32,18 +32,17 @@ def save_experiment(results, folder='../', filename='result_{}.json', verbose=Fa
         print(json.dumps(results, sort_keys=True, indent=2, separators=(',', ': ')))
 
 
-def save_experiment2(results,
-                     folder='../', filename='result_{}.json', verbose=False,
-                    error=False):
+def save_experiment2(results, folder='../', filename='result_{}.json', verbose=False):
     experiment_id = hash(json.dumps(results))
     if verbose:
-        print('Experiment id:', experiment_id)
+        print('# Experiment id:', experiment_id)
     results['experiment_id'] = experiment_id
     if filename is not None:
-        if error:
-            filename = 'error_' + filename
-        with open(os.path.join(folder, filename.format(experiment_id)), 'w') as out:
+        result_file = os.path.join(folder, filename.format(experiment_id))
+        with open(result_file, 'w') as out:
             json.dump(results, out, sort_keys=True, indent=2, separators=(',', ': '))
+        if verbose:
+            print('# Results written to {}'.format(result_file))
     else:
         print(json.dumps(results, sort_keys=True, indent=2, separators=(',', ': ')))
 
