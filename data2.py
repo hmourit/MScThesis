@@ -47,7 +47,7 @@ def _load_mdd_raw(data_path=DATA_PATH):
 
 
 MDD_RAW37_DATA_FILE = 'data.csv'
-MDD_RAW37_FACTORS_FILE = 'nfac.csv'
+MDD_RAW37_FACTORS_FILE = 'factors.csv'
 
 
 def _load_mdd_raw37(data_path=DATA_PATH):
@@ -103,7 +103,7 @@ def load(dataset,
     if (override_pickle or
             not isfile(pickled_data) or
             not isfile(pickled_factors)):
-        print('Loading and pickling')
+        print('# Loading and pickling')
         if dataset == 'mdd':
             data, factors = _load_mdd(data_path)
         elif dataset == 'mdd_raw':
