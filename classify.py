@@ -6,7 +6,7 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.linear_model import SGDClassifier
 from sklearn.pipeline import Pipeline
 import numpy as np
-from sklearn.cross_validation import StratifiedShuffleSplit
+from sklearn.cross_validation import StratifiedShuffleSplit, LeaveOneOut
 import sys
 from sklearn.svm import SVC
 
@@ -62,7 +62,7 @@ if __name__ == '__main__':
 
     result['cross_val'] = {'n_folds': args.n_folds}
 
-    pipeline = []
+    steps = []
     param_grid = None
 
     if args.clf == 'en':
@@ -86,17 +86,19 @@ if __name__ == '__main__':
         }
     }
 
+    steps.append('clf')
+
     if args.verbose:
         print('{:<7} {:<7} {}'.format('Train', 'Test', 'Time'))
     t0 = time()
     for train, test in split:
         if args.n_folds == 'loo':
-            n_folds = len(train)
+            cv = LeaveOneOut(len(train))
         else:
-            n_folds = args.n_folds
-        grid = GridSearchCV(clf, param_grid=param_grid, cv=n_folds, n_jobs=-1)
-        pipeline.append(('clf', grid))
-        pipeline = Pipeline(pipeline)
+            cv = args.n_folds
+        grid = GridSearchCV(clf, param_grid=param_grid, cv=cv, n_jobs=-1)
+        steps[-1] = ('clf', grid)
+        pipeline = Pipeline(steps)
 
         pipeline.fit(data.iloc[train, :], y=target.iloc[train])
         train_score = pipeline.score(data.iloc[train, :], y=target.iloc[train])
