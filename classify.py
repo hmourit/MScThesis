@@ -116,3 +116,6 @@ if __name__ == '__main__':
         print('# Total time: {}'.format(time() - t0))
 
     save_experiment2(result, folder=args.results_path, verbose=args.verbose)
+
+    if args.verbose:
+        print("# OK")

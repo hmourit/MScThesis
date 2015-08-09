@@ -46,6 +46,20 @@ def _load_mdd_raw(data_path=DATA_PATH):
     return data, factors
 
 
+MDD_RAW37_DATA_FILE = 'data.csv'
+MDD_RAW37_FACTORS_FILE = 'nfac.csv'
+
+
+def _load_mdd_raw37(data_path=DATA_PATH):
+    data_file = join(data_path, 'mdd_raw37', MDD_RAW37_DATA_FILE)
+    factors_file = join(data_path, 'mdd_raw37', MDD_RAW37_FACTORS_FILE)
+
+    data = pd.read_csv(data_file, index_col=0)
+    factors = pd.read_csv(factors_file, index_col=0)
+
+    return data, factors
+
+
 EPI_AD_DATA_FILE = 'GSE59685_betas.csv'
 EPI_AD_FACTORS_FILE = 'GSE59685_series_matrix.txt'
 
@@ -94,6 +108,8 @@ def load(dataset,
             data, factors = _load_mdd(data_path)
         elif dataset == 'mdd_raw':
             data, factors = _load_mdd_raw(data_path)
+        elif dataset == 'mdd_raw37':
+            data, factors = _load_mdd_raw37(data_path)
         elif dataset == 'epi_ad':
             data, factors = _load_epi_ad(data_path)
         else:
