@@ -8,7 +8,7 @@ from sklearn.pipeline import Pipeline
 import numpy as np
 from sklearn.cross_validation import StratifiedShuffleSplit, LeaveOneOut
 import sys
-from sklearn.svm import SVC
+from sklearn.svm import SVC, LinearSVC
 
 from data2 import load
 from results import save_experiment2
@@ -74,7 +74,15 @@ if __name__ == '__main__':
         c_range = np.logspace(-2, 7, 10)
         gamma_range = np.logspace(-6, 3, 10)
         param_grid = dict(gamma=gamma_range, C=c_range)
-        clf = SVC()
+        clf = SVC(cache_size=1000)
+    elif args.clf == 'svm_linear':
+        c_range = np.logspace(-2, 7, 10)
+        param_grid = dict(C=c_range)
+        clf = LinearSVC(penalty='l2')
+    elif args.clf == 'svm_linear_l1':
+        c_range = np.logspace(-2, 7, 10)
+        param_grid = dict(C=c_range)
+        clf = LinearSVC(penalty='l1')
     else:
         print('# ERROR: {} is not a valid classifier.'.format(args.clf))
         sys.exit(1)
