@@ -77,6 +77,10 @@ if __name__ == '__main__':
         gamma_range = np.logspace(-6, 3, 10)
         param_grid = dict(gamma=gamma_range, C=c_range)
         clf = SVC(cache_size=1000)
+    elif args.clf == 'svm_linear_kernel':
+        c_range = np.logspace(-2, 7, 10)
+        param_grid = dict(C=c_range)
+        clf = SVC(kernel='linear')
     elif args.clf == 'svm_linear':
         c_range = np.logspace(-2, 7, 10)
         param_grid = dict(C=c_range)
