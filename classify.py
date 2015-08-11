@@ -1,18 +1,16 @@
 from __future__ import division, print_function
 import argparse
 from time import time
-import datetime
+from datetime import datetime
 
 from sklearn.grid_search import GridSearchCV
-from sklearn.linear_model import SGDClassifier
 from sklearn.pipeline import Pipeline
 import numpy as np
 from sklearn.cross_validation import StratifiedShuffleSplit, LeaveOneOut
-import sys
-from sklearn.svm import SVC, LinearSVC
 
 from data2 import load
 from results import save_experiment2
+from scripts.base import choose_classifier
 
 
 def n_folds_parser(x):
@@ -20,6 +18,7 @@ def n_folds_parser(x):
         return 'loo'
     else:
         return int(x)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -65,33 +64,8 @@ if __name__ == '__main__':
     result['cross_val'] = {'n_folds': args.n_folds}
 
     steps = []
-    param_grid = None
 
-    if args.clf == 'en':
-        alpha_range = np.logspace(-2, 7, 10)
-        l1_ratio_range = np.arange(0., 1., 10)
-        param_grid = dict(alpha=alpha_range, l1_ratio=l1_ratio_range)
-        clf = SGDClassifier(loss='log', penalty='elasticnet')
-    elif args.clf in {'svm', 'svm_rbf'}:
-        c_range = np.logspace(-2, 7, 10)
-        gamma_range = np.logspace(-6, 3, 10)
-        param_grid = dict(gamma=gamma_range, C=c_range)
-        clf = SVC(cache_size=1000)
-    elif args.clf == 'svm_linear_kernel':
-        c_range = np.logspace(-2, 7, 10)
-        param_grid = dict(C=c_range)
-        clf = SVC(kernel='linear')
-    elif args.clf == 'svm_linear':
-        c_range = np.logspace(-2, 7, 10)
-        param_grid = dict(C=c_range)
-        clf = LinearSVC(penalty='l2')
-    elif args.clf == 'svm_linear_l1':
-        c_range = np.logspace(-2, 7, 10)
-        param_grid = dict(C=c_range)
-        clf = LinearSVC(penalty='l1', dual=False)
-    else:
-        print('# ERROR: {} is not a valid classifier.'.format(args.clf))
-        sys.exit(1)
+    clf, param_grid = choose_classifier(args.clf)
 
     result['results'] = {
         'accuracy': {
