@@ -82,7 +82,7 @@ if __name__ == '__main__':
     elif args.clf == 'svm_linear_l1':
         c_range = np.logspace(-2, 7, 10)
         param_grid = dict(C=c_range)
-        clf = LinearSVC(penalty='l1')
+        clf = LinearSVC(penalty='l1', dual=False)
     else:
         print('# ERROR: {} is not a valid classifier.'.format(args.clf))
         sys.exit(1)
