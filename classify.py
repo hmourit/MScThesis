@@ -1,6 +1,7 @@
 from __future__ import division, print_function
 import argparse
 from time import time
+import datetime
 
 from sklearn.grid_search import GridSearchCV
 from sklearn.linear_model import SGDClassifier
@@ -39,6 +40,7 @@ if __name__ == '__main__':
     if args.verbose:
         for key in result:
             print('# {}: {}'.format(key, result[key]))
+        print('# Start: ' + datetime.now().strftime("%d/%m/%y %H:%M:%S"))
 
     data, factors = load(args.data, data_path=args.data_path, log=result)
     target = factors[args.target]
