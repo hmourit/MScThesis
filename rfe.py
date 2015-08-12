@@ -109,7 +109,8 @@ def main():
         with open(result_file, 'w') as f:
             json.dump(result, f, sort_keys=True, indent=2, separators=(',', ': '))
 
-    return result
+    if args.verbose:
+        print('# OK')
 
 
 if __name__ == '__main__':
