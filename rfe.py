@@ -4,7 +4,7 @@ from datetime import datetime
 import json
 from time import time
 from sklearn.base import ClassifierMixin, BaseEstimator, clone
-from sklearn.cross_validation import StratifiedShuffleSplit
+from sklearn.cross_validation import StratifiedShuffleSplit, LeaveOneOut
 from sklearn.feature_selection import RFE
 import numpy as np
 from sklearn.grid_search import GridSearchCV
@@ -21,6 +21,13 @@ class FooClassifier(BaseEstimator, ClassifierMixin):
         self.coef_ = np.random.rand(X.shape[1])
 
 
+def n_folds_parser(x):
+    if x.lower() == 'loo':
+        return 'loo'
+    else:
+        return int(x)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--results-path', default='./bucket/results/')
@@ -28,6 +35,9 @@ def main():
     parser.add_argument('--target')
     parser.add_argument('--data-path', default='./bucket/data/')
     parser.add_argument('--verbose', '-v', action='count')
+    parser.add_argument('--test-size', type=float, default=0.1)
+    parser.add_argument('--n-iter', type=int, default=1)
+    parser.add_argument('--n-folds', default=10, type=n_folds_parser)
     parser.add_argument('--clf')
     args = parser.parse_args()
 
@@ -48,11 +58,10 @@ def main():
     target = factors[args.target]
 
     clf, param_grid = choose_classifier(args.clf, result, args.verbose)
-    estimator = GridWithCoef(clf, param_grid)
 
     feature_names = data.columns
 
-    split = StratifiedShuffleSplit(target)
+    split = StratifiedShuffleSplit(target, n_iter=args.n_iter, test_size=args.test_size)
     n_features = data.shape[1]
     n_features_to_select = 1
 
@@ -77,7 +86,11 @@ def main():
         test_scores = []
         for train, test in split:
             # Rank the remaining features
-            estimator = clone(estimator)
+            if args.n_folds == 'loo':
+                cv = LeaveOneOut(len(train))
+            else:
+                cv = args.n_folds
+            estimator = GridWithCoef(clf, param_grid, cv=cv)
 
             estimator.fit(data.iloc[train, features], target.iloc[train])
             if coef_ is None:
