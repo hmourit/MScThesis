@@ -5,10 +5,12 @@ from datetime import datetime
 from os.path import join
 
 import numpy as np
+import re
 from sklearn.base import ClassifierMixin, BaseEstimator
 from sklearn.cross_validation import StratifiedShuffleSplit, StratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+
 from sklearn.utils import safe_sqr
 
 from data2 import load
@@ -42,7 +44,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--results-path', default='./bucket/results/')
     parser.add_argument('--data')
-    parser.add_argument('--tissue')
+    parser.add_argument('--tissue', type=lambda x: re.sub(r'[\"\']', '', x) if x is not None else None)
     parser.add_argument('--target')
     parser.add_argument('--data-path', default='./bucket/data/')
     parser.add_argument('--verbose', '-v', action='count')
@@ -68,6 +70,9 @@ def main():
 
     data, factors = load(args.data, data_path=args.data_path, log=result)
     target = factors[args.target]
+
+    if args.tissue:
+        data = data[factors['source tissue'] == args.tissue]
 
     clf, param_grid = choose_classifier(args.clf, result, args.verbose)
 
