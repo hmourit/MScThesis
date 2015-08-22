@@ -46,4 +46,5 @@ for data, target, tissue in data_target_tissue:
         if tissue is not None:
             command.append('--tissue {0}'.format(tissue))
 
+        print ' '.join(command)
         os.system(' '.join(command))
