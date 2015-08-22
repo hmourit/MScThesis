@@ -9,6 +9,7 @@ from sklearn.cross_validation import StratifiedShuffleSplit
 from sklearn.feature_selection.univariate_selection import SelectKBest
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing.label import LabelEncoder
 from feature_selection import relevance
 from preprocessing.discretization import ExpressionDiscretizer
 from rfe2 import n_folds_parser, subset_sizes
@@ -28,8 +29,8 @@ def main():
     parser.add_argument('--verbose', '-v', action='count')
     parser.add_argument('--test-size', type=float, default=0.1)
     parser.add_argument('--n-iter', type=int, default=1)
-    # parser.add_argument('--n-folds', default=10, type=n_folds_parser)
-    # parser.add_argument('--clf')
+    parser.add_argument('--n-folds', default=10, type=n_folds_parser)
+    parser.add_argument('--clf')
     parser.add_argument('--filter', default='anova')
     args = parser.parse_args()
 
@@ -43,12 +44,13 @@ def main():
         print('# Start: ' + start_time)
 
     data, factors = load(args.data, data_path=args.data_path, log=result)
-    target = factors[args.target]
-
     if args.tissue:
         data = data[factors['source tissue'] == args.tissue]
+        factors = factors[factors['source tissue'] == args.tissue]
+    target = factors[args.target]
+    target_num = LabelEncoder().fit_transform(target)
 
-    # clf, param_grid = choose_classifier(args.clf, result, args.verbose)
+    clf, param_grid = choose_classifier(args.clf, result, args.verbose)
 
 
     score_params = {}
@@ -72,7 +74,7 @@ def main():
 
     split = StratifiedShuffleSplit(target, n_iter=args.n_iter, test_size=args.test_size)
     n_features = data.shape[1]
-    n_features_to_select = 10
+    n_features_to_select = 9
 
     d0 = datetime.now()
     result['experiments'] = []
@@ -80,11 +82,14 @@ def main():
         if args.verbose:
             print('### ITERATION {}'.format(i))
         if preprocessor:
-            train_data = preprocessor.fit(data.iloc[train, :]).transform(data.iloc[train, :])
+            preprocessor.fit(data.iloc[train, :])
+            train_data = preprocessor.transform(data.iloc[train, :])
+            test_data = preprocessor.transform(data.iloc[test, :])
         else:
             train_data = data.iloc[train, :]
+            test_data = data.iloc[test, :]
 
-        scores_ = score_features(train_data, target.iloc[train], **score_params)
+        scores_ = score_features(train_data, target_num[train], **score_params)
         result['experiments'].append({
             'iteration': i,
             'train_samples_label': data.index[train].tolist(),
@@ -94,34 +99,38 @@ def main():
         if args.verbose:
             print('[{}] Features scored.'.format(datetime.now() - d0))
 
-        # for threshold in subset_sizes(n_features, n_features_to_select):
-        #     if args.verbose:
-        #         print('[{}] Fitting with {} features.'.format(datetime.now() - d0, threshold))
-        #
-        #     features = np.argsort(scores_)[n_features - threshold:]
-        #     pipeline = preprocess_steps + [('grid', GridWithCoef(clf, param_grid, cv=args.n_folds))]
-        #     pipeline = Pipeline(pipeline)
-        #
-        #     pipeline.fit(data.iloc[train, features], target.iloc[train])
-        #
-        #     # Save results for current set of features
-        #     grid = pipeline.steps[-1][1]
-        #     result['experiments'][-1]['subsets'].append({
-        #         'features': data.columns[features].tolist(),
-        #         'best_params': grid.best_params_,
-        #         'train': {
-        #             'y_true': target.iloc[train].tolist(),
-        #             'y_pred': grid.predict(data.iloc[train, features]).tolist()
-        #         },
-        #         'test': {
-        #             'y_true': target.iloc[test].tolist(),
-        #             'y_pred': grid.predict(data.iloc[test, features]).tolist()
-        #         }
-        #     })
+        result['experiments'][-1]['subsets'] = []
+        current_size = n_features
+        sorted_features = np.argsort(scores_)
+        for step in subset_sizes(n_features, n_features_to_select):
+            if args.verbose:
+                print('[{}] Fitting with {} features.'.format(datetime.now() - d0, current_size))
 
-        # Store results
-        with open(result_file, 'w') as f:
-            json.dump(result, f, sort_keys=True, indent=2, separators=(',', ': '))
+            features = sorted_features[-current_size:]
+
+            grid = GridWithCoef(clf, param_grid, cv=args.n_folds)
+            grid.fit(train_data.iloc[:, features], target.iloc[train])
+
+            # Save results for current set of features
+            result['experiments'][-1]['subsets'].append({
+                'n_features': current_size,
+                'features': data.columns[features].tolist(),
+                'best_params': grid.best_params_,
+                'train': {
+                    'y_true': target.iloc[train].tolist(),
+                    'y_pred': grid.predict(train_data.iloc[:, features]).tolist()
+                },
+                'test': {
+                    'y_true': target.iloc[test].tolist(),
+                    'y_pred': grid.predict(test_data.iloc[:, features]).tolist()
+                }
+            })
+
+            # Store results
+            with open(result_file, 'w') as f:
+                json.dump(result, f, sort_keys=True, indent=2, separators=(',', ': '))
+
+            current_size -= step
 
     if args.verbose:
         print('# OK')

@@ -5,7 +5,7 @@ CWD = '-cwd'
 JOIN = '-j y'
 SHELL = '-S /bin/bash'
 QUEUE = '-q R4hi.q,R8hi.q,R32hi.q,R128hi.q'
-NAME = '-N RFE'
+NAME = '-N FS'
 OUT = '-o $HOME/bucket/logs/$JOB_ID.txt'
 
 PYTHON = 'python'
@@ -24,7 +24,8 @@ for target in ['stress', 'drug']:
 n_folds = '10'
 n_iter = '10'
 test_size = '0.1'
-filters = ['anova', 'infogain_10']
+filters = ['anova', 'infogain_10', 'infogain_exp']
+clfs = ['en', 'svm_linear_kernel', 'svm_linear', 'svm_linear_l1']
 
 for data, target, tissue in data_target_tissue:
     for filter in filters:
@@ -33,22 +34,25 @@ for data, target, tissue in data_target_tissue:
         else:
             queue = '-q R4hi.q,R8hi.q,R32hi.q,R128hi.q'
         submit_options = [CWD, JOIN, SHELL, queue, NAME, OUT]
-        command = [
-            PYTHON, SCRIPT,
-            '--data {0}'.format(data),
-            '--target {0}'.format(target),
-            '--test-size {0}'.format(test_size),
-            '--n-iter {0}'.format(n_iter),
-            '--filter {0}'.format(filter),
-            '-v'
-        ]
-        if tissue is not None:
-            command.append('--tissue {0}'.format(tissue))
 
-        with open('job.sh', 'w') as f:
-            f.write('#!/bin/bash\n')
-            for option in submit_options:
-                f.write('#$ ' + option + '\n')
-            f.write('\n' + ' '.join(command) + '\n')
+        for clf in clfs:
+            command = [
+                PYTHON, SCRIPT,
+                '--data {0}'.format(data),
+                '--target {0}'.format(target),
+                '--test-size {0}'.format(test_size),
+                '--n-iter {0}'.format(n_iter),
+                '--filter {0}'.format(filter),
+                '--clf {0}'.format(clf),
+                '-v'
+            ]
+            if tissue is not None:
+                command.append('--tissue {0}'.format(tissue))
 
-        os.system('qsub job.sh')
+            with open('job.sh', 'w') as f:
+                f.write('#!/bin/bash\n')
+                for option in submit_options:
+                    f.write('#$ ' + option + '\n')
+                f.write('\n' + ' '.join(command) + '\n')
+
+            os.system('qsub job.sh')
