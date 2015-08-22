@@ -42,6 +42,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--results-path', default='./bucket/results/')
     parser.add_argument('--data')
+    parser.add_argument('--tissue')
     parser.add_argument('--target')
     parser.add_argument('--data-path', default='./bucket/data/')
     parser.add_argument('--verbose', '-v', action='count')
@@ -77,8 +78,11 @@ def main():
     preprocess_steps = [('scaler', StandardScaler())]
 
     # RFE
+    d0 = datetime.now()
     result['experiments'] = []
     for i, (train, test) in enumerate(split):
+        if args.verbose:
+            print('### ITERATION {}'.format(i))
         result['experiments'].append({
             'iteration': i,
             'train_samples': data.index[train].tolist(),
@@ -87,6 +91,8 @@ def main():
         support_ = np.ones(n_features, dtype=np.bool)
         ranking_ = np.ones(n_features, dtype=np.int)
         for threshold in subset_sizes(n_features, n_features_to_select):
+            if args.verbose:
+                print('[{}] Selecting {} features.'.format(datetime.now() - d0, threshold))
             # Train with current subset
             pipeline = preprocess_steps + [('grid', GridWithCoef(clf, param_grid, cv=args.n_folds))]
             pipeline = Pipeline(pipeline)

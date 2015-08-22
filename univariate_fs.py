@@ -8,6 +8,7 @@ from sklearn.cross_validation import StratifiedShuffleSplit
 from sklearn.feature_selection.univariate_selection import SelectKBest
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from feature_selection import relevance
 from rfe2 import n_folds_parser, subset_sizes
 from scripts.base import choose_classifier, GridWithCoef
 
@@ -25,6 +26,7 @@ def main():
     parser.add_argument('--n-iter', type=int, default=1)
     parser.add_argument('--n-folds', default=10, type=n_folds_parser)
     parser.add_argument('--clf')
+    parser.add_argument('--filter', default='anova')
     args = parser.parse_args()
 
     result = {}
@@ -36,15 +38,24 @@ def main():
             print('# {}: {}'.format(key, result[key]))
         print('# Start: ' + start_time)
 
-    experiment_id = hash(json.dumps(result) + str(np.random.rand(10, 1)))
-    result_file = join(args.results_path, 'fs_{}.json'.format(experiment_id))
-    if args.verbose:
-        print('Results will be saved to {}'.format(result_file))
-
     data, factors = load(args.data, data_path=args.data_path, log=result)
     target = factors[args.target]
 
     clf, param_grid = choose_classifier(args.clf, result, args.verbose)
+
+    score_params = {}
+    if args.filter == 'anova':
+        score_features = anova
+    elif args.filter == 'infogain':
+        score_features = relevance
+        score_params = {'bins': 10}
+    else:
+        raise ValueError('Filter {} unknown.'.format(args.filter))
+
+    experiment_id = hash(json.dumps(result) + str(np.random.rand(10, 1)))
+    result_file = join(args.results_path, '{}_{}.json'.format(args.filter, experiment_id))
+    if args.verbose:
+        print('Results will be saved to {}'.format(result_file))
 
     split = StratifiedShuffleSplit(target, n_iter=args.n_iter, test_size=args.test_size)
     n_features = data.shape[1]
@@ -52,39 +63,50 @@ def main():
 
     preprocess_steps = [('scaler', StandardScaler())]
 
+    d0 = datetime.now()
     result['experiments'] = []
     for i, (train, test) in enumerate(split):
+        if args.verbose:
+            print('### ITERATION {}'.format(i))
         result['experiments'].append({
             'iteration': i,
-            'train_samples': data.index[train].tolist(),
-            'subsets': []
+            'train_samples_label': data.index[train].tolist(),
+            'train_samples_idx': train.tolist()
         })
-        scores_ = anova(data.iloc[train, :], target.iloc[train])
-        for threshold in subset_sizes(n_features, n_features_to_select):
-            features = np.argsort(scores_)[n_features - threshold:]
-            pipeline = preprocess_steps + [('grid', GridWithCoef(clf, param_grid, cv=args.n_folds))]
-            pipeline = Pipeline(pipeline)
-
-            pipeline.fit(data.iloc[train, features], target.iloc[train])
-
-            # Save results for current set of features
-            grid = pipeline.steps[-1][1]
-            result['experiments'][-1]['subsets'].append({
-                'features': data.columns[features].tolist(),
-                'best_params': grid.best_params_,
-                'train': {
-                    'y_true': target.iloc[train].tolist(),
-                    'y_pred': grid.predict(data.iloc[train, features]).tolist()
-                },
-                'test': {
-                    'y_true': target.iloc[test].tolist(),
-                    'y_pred': grid.predict(data.iloc[test, features]).tolist()
-                }
-            })
+        scores_ = score_features(data.iloc[train, :], target.iloc[train], **score_params)
+        if args.verbose:
+            print('[{}] Features scored.'.format(datetime.now() - d0))
+        # for threshold in subset_sizes(n_features, n_features_to_select):
+        #     if args.verbose:
+        #         print('[{}] Fitting with {} features.'.format(datetime.now() - d0, threshold))
+        #
+        #     features = np.argsort(scores_)[n_features - threshold:]
+        #     pipeline = preprocess_steps + [('grid', GridWithCoef(clf, param_grid, cv=args.n_folds))]
+        #     pipeline = Pipeline(pipeline)
+        #
+        #     pipeline.fit(data.iloc[train, features], target.iloc[train])
+        #
+        #     # Save results for current set of features
+        #     grid = pipeline.steps[-1][1]
+        #     result['experiments'][-1]['subsets'].append({
+        #         'features': data.columns[features].tolist(),
+        #         'best_params': grid.best_params_,
+        #         'train': {
+        #             'y_true': target.iloc[train].tolist(),
+        #             'y_pred': grid.predict(data.iloc[train, features]).tolist()
+        #         },
+        #         'test': {
+        #             'y_true': target.iloc[test].tolist(),
+        #             'y_pred': grid.predict(data.iloc[test, features]).tolist()
+        #         }
+        #     })
 
         # Store results
         with open(result_file, 'w') as f:
             json.dump(result, f, sort_keys=True, indent=2, separators=(',', ': '))
+
+    if args.verbose:
+        print('# OK')
 
 
 def anova(train_data, train_target):

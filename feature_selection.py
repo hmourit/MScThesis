@@ -58,6 +58,19 @@ def mi(x, y, bins=10):
 #     return selected
 
 
+def relevance(df, y, bins=10):
+    df = np.array(df)
+    y_bins = len(np.unique(y))
+
+    n_features = df.shape[1]
+
+    rel = np.zeros(n_features)
+    for i in xrange(n_features):
+        rel[i] = mi(df[:, i], y, bins=[bins, y_bins])
+
+    return rel
+
+
 def mrmr(df, y, select=100, bins=10, verbose=False):
     df = np.array(df)
     y_bins = len(np.unique(y))
