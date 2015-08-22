@@ -33,7 +33,7 @@ for data, target, tissue in data_target_tissue:
             queue = '-q R32hi.q,R128hi.q'
         else:
             queue = '-q R4hi.q,R8hi.q,R32hi.q,R128hi.q'
-        submit_options = [QSUB, CWD, JOIN, SHELL, queue, NAME, OUT]
+        submit_options = [CWD, JOIN, SHELL, queue, NAME, OUT]
         command = [
             PYTHON, SCRIPT,
             '--data {0}'.format(data),
@@ -49,7 +49,8 @@ for data, target, tissue in data_target_tissue:
 
         with open('job.sh', 'w') as f:
             f.write('#!/bin/bash\n')
-            f.writelines(['#$ ' + x for x in submit_options])
+            for option in submit_options:
+                f.write('#$ ' + option + '\n')
             f.write('\n' + ' '.join(command) + '\n')
 
         os.system('qsub job.sh')
