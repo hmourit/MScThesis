@@ -35,15 +35,15 @@ for data, target, tissue in data_target_tissue:
             queue = '-q R4hi.q,R8hi.q,R32hi.q,R128hi.q'
         command = [
             QSUB, CWD, JOIN, SHELL, QUEUE, NAME, OUT, PYTHON, PYTHON, SCRIPT,
-            '--data {}'.format(data),
-            '--target {}'.format(target),
-            '--clf {}'.format(clf),
-            '--test-size {}'.format(test_size),
-            '--n-iter {}'.format(n_iter),
-            '--n-folds {}'.format(n_folds),
+            '--data {0}'.format(data),
+            '--target {0}'.format(target),
+            '--clf {0}'.format(clf),
+            '--test-size {0}'.format(test_size),
+            '--n-iter {0}'.format(n_iter),
+            '--n-folds {0}'.format(n_folds),
             '-v'
         ]
         if tissue is not None:
-            command.append('--tissue {}'.format(tissue))
+            command.append('--tissue {0}'.format(tissue))
 
         os.system(' '.join(command))
