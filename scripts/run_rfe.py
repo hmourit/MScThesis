@@ -5,7 +5,7 @@ CWD = '-cwd'
 JOIN = '-j y'
 SHELL = '-S /bin/bash'
 QUEUE = '-q R4hi.q,R8hi.q,R32hi.q,R128hi.q'
-NAME = 'RFE'
+NAME = '-N RFE'
 OUT = '-o $HOME/bucket/logs/$JOB_ID.txt'
 
 PYTHON = 'python'
