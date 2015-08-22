@@ -37,7 +37,7 @@ def subset_sizes(n_features, n_features_to_select):
         if odd_step > 0:
             step = odd_step
         selected -= step
-        yield selected
+        yield step
 
 
 def main():
@@ -78,7 +78,7 @@ def main():
 
     split = StratifiedShuffleSplit(target, n_iter=args.n_iter, test_size=args.test_size)
     n_features = data.shape[1]
-    n_features_to_select = 10
+    n_features_to_select = 9
 
     preprocess_steps = [('scaler', StandardScaler())]
 
@@ -95,9 +95,10 @@ def main():
         })
         support_ = np.ones(n_features, dtype=np.bool)
         ranking_ = np.ones(n_features, dtype=np.int)
-        for threshold in subset_sizes(n_features, n_features_to_select):
+        for step in subset_sizes(n_features, n_features_to_select):
             if args.verbose:
-                print('[{}] Selecting {} features.'.format(datetime.now() - d0, threshold))
+                print('[{}] Evaluating with {} features and selecting {}.'
+                      .format(datetime.now() - d0, np.sum(support_), np.sum(support_) - step))
             # Train with current subset
             pipeline = preprocess_steps + [('grid', GridWithCoef(clf, param_grid, cv=args.n_folds))]
             pipeline = Pipeline(pipeline)
@@ -108,6 +109,7 @@ def main():
             # Save results for current set of features
             grid = pipeline.steps[-1][1]
             result['experiments'][-1]['subsets'].append({
+                'n_features': np.sum(support_),
                 'features': data.columns[features].tolist(),
                 'best_params': grid.best_params_,
                 'train': {
@@ -132,7 +134,7 @@ def main():
             ranks = np.ravel(ranks)
 
             # Eliminate the worse features
-            support_[features[ranks][:threshold]] = False
+            support_[features[ranks][:step]] = False
             ranking_[np.logical_not(support_)] += 1
 
             # Store results

@@ -79,21 +79,21 @@ def main():
     for i, (train, test) in enumerate(split):
         if args.verbose:
             print('### ITERATION {}'.format(i))
-        result['experiments'].append({
-            'iteration': i,
-            'train_samples_label': data.index[train].tolist(),
-            'train_samples_idx': train.tolist()
-        })
-
         if preprocessor:
             train_data = preprocessor.fit(data.iloc[train, :]).transform(data.iloc[train, :])
         else:
             train_data = data.iloc[train, :]
 
         scores_ = score_features(train_data, target.iloc[train], **score_params)
+        result['experiments'].append({
+            'iteration': i,
+            'train_samples_label': data.index[train].tolist(),
+            'train_samples_idx': train.tolist(),
+            'scores': scores_.tolist()
+        })
         if args.verbose:
             print('[{}] Features scored.'.format(datetime.now() - d0))
-        result['experiments'][-1]['scores'] = scores_.tolist()
+
         # for threshold in subset_sizes(n_features, n_features_to_select):
         #     if args.verbose:
         #         print('[{}] Fitting with {} features.'.format(datetime.now() - d0, threshold))
