@@ -34,7 +34,7 @@ for data, target, tissue in data_target_tissue:
         else:
             queue = '-q R4hi.q,R8hi.q,R32hi.q,R128hi.q'
         command = [
-            QSUB, CWD, JOIN, SHELL, QUEUE, NAME, OUT, PYTHON, PYTHON, SCRIPT,
+            QSUB, CWD, JOIN, SHELL, queue, NAME, OUT, PYTHON, SCRIPT,
             '--data {0}'.format(data),
             '--target {0}'.format(target),
             '--clf {0}'.format(clf),
