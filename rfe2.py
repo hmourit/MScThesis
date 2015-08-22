@@ -69,10 +69,10 @@ def main():
         print('Results will be saved to {}'.format(result_file))
 
     data, factors = load(args.data, data_path=args.data_path, log=result)
-    target = factors[args.target]
-
     if args.tissue:
         data = data[factors['source tissue'] == args.tissue]
+        factors = factors[factors['source tissue'] == args.tissue]
+    target = factors[args.target]
 
     clf, param_grid = choose_classifier(args.clf, result, args.verbose)
 

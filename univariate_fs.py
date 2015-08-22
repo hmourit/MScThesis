@@ -4,11 +4,13 @@ from datetime import datetime
 import json
 from os.path import join
 import numpy as np
+import re
 from sklearn.cross_validation import StratifiedShuffleSplit
 from sklearn.feature_selection.univariate_selection import SelectKBest
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from feature_selection import relevance
+from preprocessing.discretization import ExpressionDiscretizer
 from rfe2 import n_folds_parser, subset_sizes
 from scripts.base import choose_classifier, GridWithCoef
 
@@ -20,12 +22,14 @@ def main():
     parser.add_argument('--results-path', default='./bucket/results/')
     parser.add_argument('--data')
     parser.add_argument('--target')
+    parser.add_argument('--tissue',
+                        type=lambda x: re.sub(r'[\"\']', '', x) if x is not None else None)
     parser.add_argument('--data-path', default='./bucket/data/')
     parser.add_argument('--verbose', '-v', action='count')
     parser.add_argument('--test-size', type=float, default=0.1)
     parser.add_argument('--n-iter', type=int, default=1)
-    parser.add_argument('--n-folds', default=10, type=n_folds_parser)
-    parser.add_argument('--clf')
+    # parser.add_argument('--n-folds', default=10, type=n_folds_parser)
+    # parser.add_argument('--clf')
     parser.add_argument('--filter', default='anova')
     args = parser.parse_args()
 
@@ -41,14 +45,23 @@ def main():
     data, factors = load(args.data, data_path=args.data_path, log=result)
     target = factors[args.target]
 
-    clf, param_grid = choose_classifier(args.clf, result, args.verbose)
+    if args.tissue:
+        data = data[factors['source tissue'] == args.tissue]
+
+    # clf, param_grid = choose_classifier(args.clf, result, args.verbose)
+
 
     score_params = {}
+    preprocessor = None
     if args.filter == 'anova':
         score_features = anova
-    elif args.filter == 'infogain':
+    elif args.filter == 'infogain_10':
         score_features = relevance
         score_params = {'bins': 10}
+    elif args.filter == 'infogain_exp':
+        preprocessor = ExpressionDiscretizer()
+        score_features = relevance
+        score_params = {'bins': 3}
     else:
         raise ValueError('Filter {} unknown.'.format(args.filter))
 
@@ -61,8 +74,6 @@ def main():
     n_features = data.shape[1]
     n_features_to_select = 10
 
-    preprocess_steps = [('scaler', StandardScaler())]
-
     d0 = datetime.now()
     result['experiments'] = []
     for i, (train, test) in enumerate(split):
@@ -73,9 +84,16 @@ def main():
             'train_samples_label': data.index[train].tolist(),
             'train_samples_idx': train.tolist()
         })
-        scores_ = score_features(data.iloc[train, :], target.iloc[train], **score_params)
+
+        if preprocessor:
+            train_data = preprocessor.fit(data.iloc[train, :]).transform(data.iloc[train, :])
+        else:
+            train_data = data.iloc[train, :]
+
+        scores_ = score_features(train_data, target.iloc[train], **score_params)
         if args.verbose:
             print('[{}] Features scored.'.format(datetime.now() - d0))
+        result['experiments'][-1]['scores'] = scores_.tolist()
         # for threshold in subset_sizes(n_features, n_features_to_select):
         #     if args.verbose:
         #         print('[{}] Fitting with {} features.'.format(datetime.now() - d0, threshold))
