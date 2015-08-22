@@ -9,7 +9,7 @@ NAME = '-N FS'
 OUT = '-o $HOME/bucket/logs/$JOB_ID.txt'
 
 PYTHON = 'python'
-SCRIPT = '$HOME/MScThesis/rfe2.py'
+SCRIPT = '$HOME/MScThesis/univariate_fs.py'
 
 data_target_tissue = []
 epi_ad_tissues = ["cerebellum", "entorhinal cortex", "frontal cortex", "superior temporal gyrus",
