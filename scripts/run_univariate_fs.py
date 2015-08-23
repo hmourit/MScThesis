@@ -16,6 +16,7 @@ epi_ad_tissues = ["cerebellum", '"entorhinal cortex"', '"frontal cortex"',
                   '"superior temporal gyrus"', '"whole blood"']
 for tissue in epi_ad_tissues:
     data_target_tissue.append(('epi_ad', 'ad.disease.status', tissue))
+    data_target_tissue.append(('epi_ad', 'braak.stage', tissue))
 
 # for target in ['stress', 'drug']:
 #     for data in ['mdd', 'mdd_raw', 'mdd_raw37']:
