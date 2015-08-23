@@ -1,4 +1,5 @@
 from __future__ import division, print_function
+from socket import gethostname
 import argparse
 from datetime import datetime
 import json
@@ -41,6 +42,7 @@ def main():
     if args.verbose:
         for key in result:
             print('# {}: {}'.format(key, result[key]))
+        print('# Running in: ' + gethostname())
         print('# Start: ' + start_time)
 
     data, factors = load(args.data, data_path=args.data_path, log=result)

@@ -3,6 +3,7 @@ import argparse
 import json
 from datetime import datetime
 from os.path import join
+from socket import gethostname
 
 import numpy as np
 import re
@@ -61,6 +62,7 @@ def main():
     if args.verbose:
         for key in result:
             print('# {}: {}'.format(key, result[key]))
+        print('# Running in: ' + gethostname())
         print('# Start: ' + start_time)
 
     experiment_id = hash(json.dumps(result) + str(np.random.rand(10, 1)))
@@ -68,7 +70,11 @@ def main():
     if args.verbose:
         print('Results will be saved to {}'.format(result_file))
 
-    data, factors = load(args.data, data_path=args.data_path, log=result)
+    load_params = {}
+    if args.data == 'epi_ad':
+        load_params = {'read_original': True, 'skip_pickle': True}
+
+    data, factors = load(args.data, data_path=args.data_path, log=result, **load_params)
     if args.tissue:
         data = data[factors['source tissue'] == args.tissue]
         factors = factors[factors['source tissue'] == args.tissue]

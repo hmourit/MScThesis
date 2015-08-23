@@ -17,9 +17,9 @@ epi_ad_tissues = ["cerebellum", '"entorhinal cortex"', '"frontal cortex"',
 for tissue in epi_ad_tissues:
     data_target_tissue.append(('epi_ad', 'ad.disease.status', tissue))
 
-for target in ['stress', 'drug']:
-    for data in ['mdd', 'mdd_raw', 'mdd_raw37']:
-        data_target_tissue.append((data, target, None))
+# for target in ['stress', 'drug']:
+#     for data in ['mdd', 'mdd_raw', 'mdd_raw37']:
+#         data_target_tissue.append((data, target, None))
 
 
 n_folds = '10'

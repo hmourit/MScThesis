@@ -92,41 +92,6 @@ def _load_epi_ad(data_path=DATA_PATH):
     return data, factors
 
 
-def load(dataset,
-         data_path=DATA_PATH,
-         override_pickle=False,
-         log=None):
-    path = join(data_path, dataset)
-    pickled_data = join(path, PICKLED_FOLDER, PICKLED_DATA_FILE)
-    pickled_factors = join(path, PICKLED_FOLDER, PICKLED_FACTORS_FILE)
-
-    if (override_pickle or
-            not isfile(pickled_data) or
-            not isfile(pickled_factors)):
-        print('# Loading and pickling')
-        if dataset == 'mdd':
-            data, factors = _load_mdd(data_path)
-        elif dataset == 'mdd_raw':
-            data, factors = _load_mdd_raw(data_path)
-        elif dataset == 'mdd_raw37':
-            data, factors = _load_mdd_raw37(data_path)
-        elif dataset == 'epi_ad':
-            data, factors = _load_epi_ad(data_path)
-        else:
-            raise ValueError('Dataset {} unknown.'.format(dataset))
-        _pickle_files(dataset, data, factors, data_path=data_path)
-    else:
-        with open(pickled_data, 'rb') as f:
-            data = pickle.load(f)
-        with open(pickled_factors, 'rb') as f:
-            factors = pickle.load(f)
-
-    if log is not None:
-        log['data'] = dataset
-
-    return data, factors
-
-
 def _pickle_files(dataset,
                   data,
                   factors,
@@ -140,3 +105,40 @@ def _pickle_files(dataset,
 
     with open(pickled_factors, 'wb') as f:
         pickle.dump(factors, f)
+
+
+def load(dataset,
+         data_path=DATA_PATH,
+         read_original=False,
+         skip_pickle=False,
+         log=None):
+    path = join(data_path, dataset)
+    pickled_data = join(path, PICKLED_FOLDER, PICKLED_DATA_FILE)
+    pickled_factors = join(path, PICKLED_FOLDER, PICKLED_FACTORS_FILE)
+
+    if (read_original or
+            not isfile(pickled_data) or
+            not isfile(pickled_factors)):
+        print('# Loading and pickling')
+        if dataset == 'mdd':
+            data, factors = _load_mdd(data_path)
+        elif dataset == 'mdd_raw':
+            data, factors = _load_mdd_raw(data_path)
+        elif dataset == 'mdd_raw37':
+            data, factors = _load_mdd_raw37(data_path)
+        elif dataset == 'epi_ad':
+            data, factors = _load_epi_ad(data_path)
+        else:
+            raise ValueError('Dataset {} unknown.'.format(dataset))
+        if not skip_pickle:
+            _pickle_files(dataset, data, factors, data_path=data_path)
+    else:
+        with open(pickled_data, 'rb') as f:
+            data = pickle.load(f)
+        with open(pickled_factors, 'rb') as f:
+            factors = pickle.load(f)
+
+    if log is not None:
+        log['data'] = dataset
+
+    return data, factors
