@@ -43,6 +43,7 @@ for data, target, tissue in data_target_tissue:
             '--test-size {0}'.format(test_size),
             '--n-iter {0}'.format(n_iter),
             '--n-folds {0}'.format(n_folds),
+            '--results-path /storage/gArray/ADAM/Hector',
             '-v'
         ]
         if tissue is not None:

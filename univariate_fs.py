@@ -45,7 +45,11 @@ def main():
         print('# Running in: ' + gethostname())
         print('# Start: ' + start_time)
 
-    data, factors = load(args.data, data_path=args.data_path, log=result)
+    load_params = {}
+    if args.data == 'epi_ad':
+        load_params = {'read_original': True, 'skip_pickle': True}
+
+    data, factors = load(args.data, data_path=args.data_path, log=result, **load_params)
     if args.tissue:
         data = data[factors['source tissue'] == args.tissue]
         factors = factors[factors['source tissue'] == args.tissue]
