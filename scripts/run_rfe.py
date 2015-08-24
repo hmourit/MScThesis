@@ -16,7 +16,7 @@ epi_ad_tissues = ["cerebellum", '"entorhinal cortex"', '"frontal cortex"',
                   '"superior temporal gyrus"', '"whole blood"']
 for tissue in epi_ad_tissues:
     data_target_tissue.append(('epi_ad', 'ad.disease.status', tissue))
-    data_target_tissue.append(('epi_ad', 'braak.stage', tissue))
+    # data_target_tissue.append(('epi_ad', 'braak.stage', tissue))
 
 # for target in ['stress', 'drug']:
 #     for data in ['mdd', 'mdd_raw', 'mdd_raw37']:
@@ -43,7 +43,7 @@ for data, target, tissue in data_target_tissue:
             '--test-size {0}'.format(test_size),
             '--n-iter {0}'.format(n_iter),
             '--n-folds {0}'.format(n_folds),
-            '--results-path /storage/gArray/ADAM/Hector',
+            '--results-path /storage/gArray/ADAM/Hector/results',
             '-v'
         ]
         if tissue is not None:
