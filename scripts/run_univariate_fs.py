@@ -45,7 +45,6 @@ for data, target, tissue in data_target_tissue:
                 '--n-iter {0}'.format(n_iter),
                 '--filter {0}'.format(filter),
                 '--clf {0}'.format(clf),
-                '--results-path /storage/gArray/ADAM/Hector',
                 '-v'
             ]
             if tissue is not None:
