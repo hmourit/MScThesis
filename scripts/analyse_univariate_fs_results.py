@@ -24,7 +24,7 @@ def main():
     for f in listdir(path):
         basename = os.path.basename(f)
         if basename.startswith(('anova', 'infogain')):
-            status = analyse_univariate(json.load(open(f, 'r')))
+            status = analyse_univariate(json.load(open(join(path, f), 'r')))
             print('{0}\t{1}'.format(basename, status))
 
     # for method in methods:
