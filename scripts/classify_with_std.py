@@ -12,7 +12,7 @@ from sklearn.svm import SVC
 from sklearn.linear_model import SGDClassifier
 from sklearn.cross_validation import cross_val_score
 
-from utils_2 import Timer
+from utils import Timer
 from results import save_experiment
 import data
 

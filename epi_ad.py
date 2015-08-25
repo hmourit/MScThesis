@@ -11,7 +11,7 @@ from sklearn.svm import SVC
 from data import load_mdd_data, load_epi_ad_data
 from sklearn.cross_validation import StratifiedShuffleSplit, cross_val_score
 from results import save_experiment
-from utils_2 import Timer
+from utils import Timer
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
