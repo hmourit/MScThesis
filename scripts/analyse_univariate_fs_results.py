@@ -2,15 +2,31 @@ from __future__ import division, print_function
 import json
 import sys
 from os.path import join
+from os import listdir
+import os
 from Queue import Queue
 
 from glob import glob
 
 methods = ['anova', 'infogain_exp', 'infogain_10', 'rfe']
 
+
+def analyse_univariate(document):
+    last_it = len(document['experiments'])
+    n_subsets = len(document['experiments'[0]])
+    last_subset = len(document['experiments'][-1])
+    return '{0}:{1}/{2}:{3}'.format(last_it, last_subset, document['n_iter'], n_subsets)
+
+
 def main():
-    path = sys.argv
+    path = sys.argv[1]
     print(path)
+    for f in listdir(path):
+        basename = os.path.basename(f)
+        if basename.startswith(('anova', 'infogain')):
+            status = analyse_univariate(json.load(open(f, 'r')))
+            print('{0}\t{1}'.format(basename, status))
+
     # for method in methods:
     #     print('### {0}'.format(method))
     #     files = glob(join(path, '{0}_*.json'.format(method)))
