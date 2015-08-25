@@ -6,7 +6,7 @@ from os.path import join
 from utils import extract_json_fields
 from glob import glob
 
-methods = {'anova', 'infogain_exp', 'infogain_10', 'rfe'}
+methods = ['anova', 'infogain_exp', 'infogain_10', 'rfe']
 
 
 def main():
