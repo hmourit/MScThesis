@@ -35,7 +35,7 @@ def extract_json_fields(document):
 
 
 def main():
-    path = sys.argv[0]
+    path = sys.argv[1]
     for method in methods:
         print('### {0}'.format(method))
         files = glob(join(path, '{0}_*.json'.format(method)))
