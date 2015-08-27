@@ -41,11 +41,15 @@ if __name__ == '__main__':
             print('Finished')
             result_basename = os.path.basename(result_file)
             z = zipfile.ZipFile(zip_file, 'a', compression=zipfile.ZIP_DEFLATED)
-            z.write(result_file)
-            z.close()
-            shutil.move(log_file, new_name)
-            os.remove(result_file)
-            print('-: {0} added to zip and removed.'.format(result_basename))
+            try:
+                z.write(result_file)
+                shutil.move(log_file, new_name)
+                os.remove(result_file)
+                print('-: {0} added to zip and removed.'.format(result_basename))
+            except OSError as e:
+                print(e.strerror)
+            finally:
+                z.close()
             any_finished = True
         else:
             print('Not finished yet')
