@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     for log_file in log_files:
         log_basename = os.path.basename(log_file)
-        print('{}: '.format(log_basename), end='')
+        print('{0}: '.format(log_basename), end='', )
         result_file = None
         ok = False
         with open(log_file, 'r') as f:
@@ -37,6 +37,6 @@ if __name__ == '__main__':
             print('Finished')
             result_basename = os.path.basename(result_file)
             # TODO: add to zip
-            print('- {} added to zip.'.format(result_basename))
+            print('- {0} added to zip.'.format(result_basename))
         else:
             print('Not finished yet')
