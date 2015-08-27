@@ -14,7 +14,7 @@ if __name__ == '__main__':
     logs_path = './bucket/logs'
     logs_pattern = sys.argv[1]
 
-    start_time = datetime.now().strftime("%d-%m-%y_%H.%M.%S")
+    start_time = datetime.now().strftime("%y%m%d_%H%M%S")
     zip_file = './bucket/results/block_' + start_time + '.zip'
     zip_basename = os.path.basename(zip_file)
 
@@ -38,11 +38,12 @@ if __name__ == '__main__':
         if ok:
             new_basename = 'finished_' + log_basename
             new_name = log_file.replace(log_basename, new_basename)
-            shutil.move(log_file, new_name)
             print('Finished')
             result_basename = os.path.basename(result_file)
-            with zipfile.ZipFile(zip_file, 'a') as zip:
-                zip.write(result_file)
+            z = zipfile.ZipFile(zip_file, 'a', compression=zipfile.ZIP_DEFLATED)
+            z.write(result_file)
+            z.close()
+            shutil.move(log_file, new_name)
             os.remove(result_file)
             print('-: {0} added to zip and removed.'.format(result_basename))
             any_finished = True
