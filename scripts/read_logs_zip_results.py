@@ -21,19 +21,22 @@ if __name__ == '__main__':
 
     for log_file in log_files:
         log_basename = os.path.basename(log_file)
+        print('{}: '.format(log_basename), end='')
         result_file = None
         ok = False
         with open(log_file, 'r') as f:
             for line in f:
                 if line.startswith('Results will be saved to'):
-                    results_path = [x for x in line.split() if x.endswith('.json')][1].strip()
+                    results_path = [x for x in line.split() if x.endswith('.json')][0].strip()
                 elif line.startswith('# OK'):
                     ok = True
         if ok:
             new_basename = 'finished_' + log_basename
             new_name = log_file.replace(log_basename, new_basename)
             # TODO: move
-            print('{} moved to {}.'.format(log_basename, new_basename))
+            print('Finished')
             result_basename = os.path.basename(result_file)
             # TODO: add to zip
-            print('{} added to zip.'.format(result_basename))
+            print('- {} added to zip.'.format(result_basename))
+        else:
+            print('Not finished yet')
