@@ -45,12 +45,12 @@ if __name__ == '__main__':
                 z.write(result_file)
                 shutil.move(log_file, new_name)
                 os.remove(result_file)
+                any_finished = True
                 print('-: {0} added to zip and removed.'.format(result_basename))
             except OSError as e:
                 print(e)
             finally:
                 z.close()
-            any_finished = True
         else:
             print('Not finished yet')
 
