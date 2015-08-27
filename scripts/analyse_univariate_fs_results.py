@@ -23,8 +23,9 @@ def main():
     f = sys.argv[1]
     f = open(f, 'r')
     for line in f:
-        line = line.strip()
-        if line.startswith('"iteration'):
+        if ('iteration' in line
+            or 'subsets' in line
+            or 'n_features' in line):
             print(line)
 
 
