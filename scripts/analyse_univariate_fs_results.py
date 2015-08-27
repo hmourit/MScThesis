@@ -19,16 +19,26 @@ def analyse_univariate(document):
 
 
 def main():
-    path = sys.argv[1]
-    print(path)
-    for f in listdir(path):
-        basename = os.path.basename(f)
-        if basename.startswith(('anova', 'infogain')):
-            try:
-                status = analyse_univariate(json.load(open(join(path, f), 'r')))
-            except:
-                status = 'ERROR'
-            print('{0}\t{1}'.format(basename, status))
+
+    f = sys.argv[1]
+    f = open(f, 'r')
+    for line in f:
+        line = line.strip()
+        if line.startswith('"iteration'):
+            print(line)
+
+
+# def main():
+#     path = sys.argv[1]
+#     print(path)
+#     for f in listdir(path):
+#         basename = os.path.basename(f)
+#         if basename.startswith(('anova', 'infogain')):
+#             try:
+#                 status = analyse_univariate(json.load(open(join(path, f), 'r')))
+#             except:
+#                 status = 'ERROR'
+#             print('{0}\t{1}'.format(basename, status))
 
 
     # for method in methods:
