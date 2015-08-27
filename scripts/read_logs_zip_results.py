@@ -29,7 +29,7 @@ if __name__ == '__main__':
         with open(log_file, 'r') as f:
             for line in f:
                 if line.startswith('Results will be saved to'):
-                    results_path = [x for x in line.split() if x.endswith('.json')][0].strip()
+                    results_file = [x for x in line.split() if x.endswith('.json')][0].strip()
                 elif line.startswith('# OK'):
                     ok = True
         if ok:
@@ -37,7 +37,7 @@ if __name__ == '__main__':
             new_name = log_file.replace(log_basename, new_basename)
             # TODO: move
             print('Finished')
-            print(result_file)
+            # print(result_file)
             result_basename = os.path.basename(result_file)
             # TODO: add to zip
             print('- {0} added to zip.'.format(result_basename))
