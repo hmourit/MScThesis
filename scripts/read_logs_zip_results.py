@@ -5,6 +5,7 @@ import os
 import zipfile
 import sys
 from datetime import datetime
+import shutil
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
@@ -21,6 +22,8 @@ if __name__ == '__main__':
     print('Reading {0}'.format(logs_pattern))
     log_files = glob(logs_pattern)
 
+    any_finished = False
+
     for log_file in log_files:
         log_basename = os.path.basename(log_file)
         print('{0}: '.format(log_basename), end='', )
@@ -35,11 +38,16 @@ if __name__ == '__main__':
         if ok:
             new_basename = 'finished_' + log_basename
             new_name = log_file.replace(log_basename, new_basename)
-            # TODO: move
+            shutil.move(log_file, new_name)
             print('Finished')
-            # print(result_file)
             result_basename = os.path.basename(result_file)
-            # TODO: add to zip
-            print('- {0} added to zip.'.format(result_basename))
+            with zipfile.ZipFile(zip_file, 'a') as zip:
+                zip.write(result_file)
+            os.remove(result_file)
+            print('-: {0} added to zip and removed.'.format(result_basename))
+            any_finished = True
         else:
             print('Not finished yet')
+
+    if any_finished:
+        print('Results zipped in {0}'.format(zip_basename))
