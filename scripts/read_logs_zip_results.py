@@ -29,7 +29,7 @@ if __name__ == '__main__':
         with open(log_file, 'r') as f:
             for line in f:
                 if line.startswith('Results will be saved to'):
-                    results_file = [x for x in line.split() if x.endswith('.json')][0].strip()
+                    result_file = [x for x in line.split() if x.endswith('.json')][0].strip()
                 elif line.startswith('# OK'):
                     ok = True
         if ok:
