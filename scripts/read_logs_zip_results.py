@@ -47,7 +47,7 @@ if __name__ == '__main__':
                 os.remove(result_file)
                 print('-: {0} added to zip and removed.'.format(result_basename))
             except OSError as e:
-                print(e.strerror)
+                print(e.message)
             finally:
                 z.close()
             any_finished = True
