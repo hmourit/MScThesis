@@ -19,14 +19,17 @@ def analyse_univariate(document):
 
 
 def main():
-
     f = sys.argv[1]
+    print('###########')
+    print(f)
+    print('###########')
     f = open(f, 'r')
     for line in f:
-        if ('iteration' in line
-            or 'subsets' in line
-            or 'n_features' in line):
+        if 'iteration' in line:
+            print()
             print(line)
+        elif 'n_features' in line:
+            print(line.split(':')[1].strip(), end=',')
 
 
 # def main():
