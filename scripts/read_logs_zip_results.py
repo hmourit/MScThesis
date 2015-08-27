@@ -30,6 +30,7 @@ if __name__ == '__main__':
             for line in f:
                 if line.startswith('Results will be saved to'):
                     results_path = [x for x in line.split() if x.endswith('.json')][0].strip()
+                    print(line, '||', results_path)
                 elif line.startswith('# OK'):
                     ok = True
         if ok:
