@@ -17,7 +17,9 @@ if __name__ == '__main__':
     zip_file = './bucket/results/block_' + start_time + '.zip'
     zip_basename = os.path.basename(zip_file)
 
-    log_files = glob(os.path.join(logs_path, logs_pattern))
+    logs_pattern = os.path.join(logs_path, logs_pattern)
+    print('Reading {0}'.format(logs_pattern))
+    log_files = glob(logs_pattern)
 
     for log_file in log_files:
         log_basename = os.path.basename(log_file)
