@@ -45,7 +45,7 @@ if __name__ == '__main__':
             new_name = log_file.replace(log_basename, new_basename)
             result_basename = os.path.basename(result_file)
             try:
-                _ = json.load(result_file)
+                _ = json.load(open(result_file, 'r'))
             except ValueError as e:
                 print(e)
                 continue
