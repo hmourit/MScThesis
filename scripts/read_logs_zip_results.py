@@ -29,28 +29,43 @@ if __name__ == '__main__':
         print('{0}: '.format(log_basename), end='', )
         result_file = None
         ok = False
+        error = False
         with open(log_file, 'r') as f:
             for line in f:
                 if line.startswith('Results will be saved to'):
                     result_file = [x for x in line.split() if x.endswith('.json')][0].strip()
                 elif line.startswith('# OK'):
                     ok = True
+            if 'Error' in line:
+                print(line)
+                error = True
         if ok:
             new_basename = 'finished_' + log_basename
             new_name = log_file.replace(log_basename, new_basename)
             print('Finished')
             result_basename = os.path.basename(result_file)
-            z = zipfile.ZipFile(zip_file, 'a', compression=zipfile.ZIP_DEFLATED)
-            try:
-                z.write(result_file)
-                shutil.move(log_file, new_name)
-                os.remove(result_file)
-                any_finished = True
-                print('-: {0} added to zip and removed.'.format(result_basename))
-            except OSError as e:
-                print(e)
-            finally:
-                z.close()
+            # z = zipfile.ZipFile(zip_file, 'a', compression=zipfile.ZIP_DEFLATED)
+            # try:
+            #     z.write(result_file)
+            #     shutil.move(log_file, new_name)
+            #     os.remove(result_file)
+            #     any_finished = True
+            #     print('-: {0} added to zip and removed.'.format(result_basename))
+            # except OSError as e:
+            #     print(e)
+            # finally:
+            #     z.close()
+        elif error:
+            new_basename = 'finished_' + log_basename
+            new_name = log_file.replace(log_basename, new_basename)
+            result_basename = os.path.basename(result_file)
+            shutil.move(log_file, new_name)
+            remove = raw_input('Remove results? y/[n]')
+            if remove:
+                if os.path.isfile(result_file):
+                    os.remove(result_file)
+                else:
+                    print("Couldn't remove " + result_file)
         else:
             print('Not finished yet')
 
