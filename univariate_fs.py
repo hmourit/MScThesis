@@ -7,7 +7,7 @@ from os.path import join
 import numpy as np
 import re
 from sklearn.cross_validation import StratifiedShuffleSplit
-from sklearn.feature_selection.univariate_selection import SelectKBest
+from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing.label import LabelEncoder
@@ -58,7 +58,6 @@ def main():
 
     clf, param_grid = choose_classifier(args.clf, result, args.verbose)
 
-
     score_params = {}
     preprocessor = None
     if args.filter == 'anova':
@@ -69,6 +68,10 @@ def main():
     elif args.filter == 'infogain_exp':
         preprocessor = ExpressionDiscretizer()
         score_features = relevance
+        score_params = {'bins': 3}
+    elif args.filter == 'chi2':
+        preprocessor = ExpressionDiscretizer()
+        score_features = chi_squared
         score_params = {'bins': 3}
     else:
         raise ValueError('Filter {} unknown.'.format(args.filter))
@@ -148,6 +151,12 @@ def anova(train_data, train_target):
     scores_ = selector.scores_
     return scores_
 
+
+def chi_squared(train_data, train_target):
+    selector = SelectKBest(k='all', score_func=chi2)
+    selector.fit(train_data, train_target)
+    scores_ = selector.scores_
+    return scores_
 
 if __name__ == '__main__':
     main()

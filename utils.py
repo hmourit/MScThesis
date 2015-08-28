@@ -60,21 +60,21 @@ def extract_json_fields(document):
     q = Queue()
     if isinstance(document, list):
         for d in document:
-            q.put(('[', d))
+            q.put(('', d))
     elif isinstance(document, dict):
-        q.put(document)
+        q.put(('', document))
     else:
         raise ValueError("Document doesn't have a valid format.")
 
-    fields = {}
+    fields = set()
     while not q.empty():
         prefix, d = q.get()
         if isinstance(d, list):
             for dd in d:
-                q.put((prefix + '[', dd))
+                q.put((prefix + '[' if prefix else '', dd))
         elif isinstance(d, dict):
             for key in d:
-                q.put((prefix + '.' + key, d[key]))
+                q.put((prefix + '.' + key if prefix else key, d[key]))
         else:
             fields.add(prefix)
 
