@@ -32,6 +32,8 @@ test_size = '0.1'
 filters = ['chi2']
 clfs = ['en', 'svm_linear_kernel', 'svm_linear', 'svm_linear_l1']
 
+n_jobs = 0
+
 for _ in xrange(n_iter):
     for data, target, tissue in data_target_tissue:
         for filter in filters:
@@ -62,3 +64,6 @@ for _ in xrange(n_iter):
                     f.write('\n' + ' '.join(command) + '\n')
 
                 os.system('qsub job.sh')
+                n_jobs += 1
+
+print('# {0} jobs submitted.'.format(n_jobs))
