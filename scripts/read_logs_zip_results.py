@@ -61,12 +61,10 @@ if __name__ == '__main__':
             result_basename = os.path.basename(result_file)
             shutil.move(log_file, new_name)
             if result_file:
-                remove = raw_input('Remove results? y/[n]')
-                if remove.lower() == 'y':
-                    if os.path.isfile(result_file):
-                        os.remove(result_file)
-                    else:
-                        print("Couldn't remove " + result_file)
+                if os.path.isfile(result_file):
+                    os.remove(result_file)
+                else:
+                    print("Couldn't remove " + result_file)
         else:
             print('Not finished yet')
 
