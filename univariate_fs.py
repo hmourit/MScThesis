@@ -72,7 +72,6 @@ def main():
     elif args.filter == 'chi2':
         preprocessor = ExpressionDiscretizer()
         score_features = chi_squared
-        score_params = {'bins': 3}
     else:
         raise ValueError('Filter {} unknown.'.format(args.filter))
 
