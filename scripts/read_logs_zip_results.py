@@ -58,7 +58,6 @@ if __name__ == '__main__':
         elif error:
             new_basename = 'finished_' + log_basename
             new_name = log_file.replace(log_basename, new_basename)
-            result_basename = os.path.basename(result_file)
             shutil.move(log_file, new_name)
             if result_file:
                 if os.path.isfile(result_file):
