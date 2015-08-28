@@ -46,10 +46,11 @@ if __name__ == '__main__':
             result_basename = os.path.basename(result_file)
             try:
                 _ = json.load(result_file)
-                print('Finished')
             except ValueError as e:
                 print(e)
                 continue
+
+            print('Finished')
 
             z = zipfile.ZipFile(zip_file, 'a', compression=zipfile.ZIP_DEFLATED)
             try:
