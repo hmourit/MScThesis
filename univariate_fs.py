@@ -11,6 +11,7 @@ from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing.label import LabelEncoder
+import sys
 from feature_selection import relevance
 from preprocessing.discretization import ExpressionDiscretizer
 from rfe2 import n_folds_parser, subset_sizes
@@ -44,6 +45,7 @@ def main():
             print('# {}: {}'.format(key, result[key]))
         print('# Running in: ' + gethostname())
         print('# Start: ' + start_time)
+        sys.stdout.flush()
 
     load_params = {}
     if args.data == 'epi_ad':
@@ -79,6 +81,7 @@ def main():
     result_file = join(args.results_path, '{}_{}.json'.format(args.filter, experiment_id))
     if args.verbose:
         print('Results will be saved to {}'.format(result_file))
+        sys.stdout.flush()
 
     split = StratifiedShuffleSplit(target, n_iter=args.n_iter, test_size=args.test_size)
     n_features = data.shape[1]
@@ -106,6 +109,7 @@ def main():
         })
         if args.verbose:
             print('[{}] Features scored.'.format(datetime.now() - d0))
+            sys.stdout.flush()
 
         result['experiments'][-1]['subsets'] = []
         current_size = n_features
@@ -113,6 +117,7 @@ def main():
         for step in subset_sizes(n_features, n_features_to_select):
             if args.verbose:
                 print('[{}] Fitting with {} features.'.format(datetime.now() - d0, current_size))
+                sys.stdout.flush()
 
             features = sorted_features[-current_size:]
 
@@ -142,6 +147,7 @@ def main():
 
     if args.verbose:
         print('# OK')
+        sys.stdout.flush()
 
 
 def anova(train_data, train_target):
