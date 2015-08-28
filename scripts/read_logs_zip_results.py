@@ -1,6 +1,7 @@
 from __future__ import division, print_function
 
 from glob import glob
+import json
 import os
 import zipfile
 import sys
@@ -42,8 +43,14 @@ if __name__ == '__main__':
         if ok:
             new_basename = 'finished_' + log_basename
             new_name = log_file.replace(log_basename, new_basename)
-            print('Finished')
             result_basename = os.path.basename(result_file)
+            try:
+                _ = json.load(result_file)
+                print('Finished')
+            except ValueError as e:
+                print(e)
+                continue
+
             z = zipfile.ZipFile(zip_file, 'a', compression=zipfile.ZIP_DEFLATED)
             try:
                 z.write(result_file)
