@@ -75,7 +75,7 @@ if __name__ == '__main__':
             })
             with open(result_file, 'w') as f:
                 json.dump(result, f, sort_keys=True, indent=2, separators=(',', ': '))
-            print('{} features selected.')
+            print('{} features selected.'.format(i))
             sys.stdout.flush()
 
     print('# OK')
