@@ -48,7 +48,8 @@ if __name__ == '__main__':
     target_num = LabelEncoder().fit_transform(target)
 
     split = StratifiedShuffleSplit(target, n_iter=1, test_size=args.test_size)
-    train, test = next(split)
+    for train, test in split:
+        pass
 
     data = data.iloc[train, :]
     target = target.iloc[train]
