@@ -55,20 +55,22 @@ if __name__ == '__main__':
             z = zipfile.ZipFile(zip_file, 'a', compression=zipfile.ZIP_DEFLATED)
             try:
                 z.write(result_file)
-                shutil.move(log_file, new_name)
                 any_finished = True
-                print('-: {0} added to zip and removed.'.format(result_basename))
             except OSError as e:
                 print(e)
             finally:
                 z.close()
+
+            shutil.move(log_file, new_name)
+            print('-: {0} added to zip and removed.'.format(result_basename))
+
             zip_folder = zip_file.rstrip('.zip')
             if not os.path.isdir(zip_folder):
                 os.mkdir(zip_folder)
             shutil.move(result_file, zip_folder)
 
         elif error:
-            new_basename = 'finished_' + log_basename
+            new_basename = 'error_' + log_basename
             new_name = log_file.replace(log_basename, new_basename)
             shutil.move(log_file, new_name)
             if result_file:
@@ -76,6 +78,7 @@ if __name__ == '__main__':
                     os.remove(result_file)
                 else:
                     print("Couldn't remove " + result_file)
+
         else:
             print('Not finished yet')
 
