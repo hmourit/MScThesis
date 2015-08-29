@@ -71,6 +71,51 @@ def relevance(df, y, bins=10):
     return rel
 
 
+def mrmr_iter(df, y, select=100, bins=10, verbose=False):
+    df = np.array(df)
+    y_bins = len(np.unique(y))
+
+    n_features = df.shape[1]
+
+    if verbose:
+        max_len = len(str(df.shape[1]))
+        print('{:<{}} {:<9} {}'.format('Feat', max(4, max_len), 'Score', 'Time'))
+        t0 = time()
+
+    rel_red = []
+    best = (-1, -np.inf)
+    for i in xrange(n_features):
+        rel = mi(df[:, i], y, bins=[bins, y_bins])
+        if rel > best[1]:
+            best = (i, rel)
+        rel_red.append((rel, 0.0))
+    selected = [best[0]]
+    scores = [best[1]]
+
+    if verbose:
+        print('{:<{}d} {: 9.6f} {}'
+              .format(selected[-1], max(4, max_len), scores[-1], time() - t0))
+    yield selected[-1]
+
+    while len(selected) < select:
+        best = (-1, -np.inf)
+        for i in xrange(n_features):
+            if i in selected:
+                continue
+            rel, red = rel_red[i]
+            red += mi(df[:, i], df[:, selected[-1]], bins=bins)
+            score = rel - red / len(selected)
+            if score > best[1]:
+                best = (i, score)
+
+        selected.append(best[0])
+        scores.append(best[1])
+        if verbose:
+            print('{:<{}d} {: 9.6f} {}'
+                  .format(selected[-1], max(4, max_len), scores[-1], time() - t0))
+        yield selected[-1]
+
+
 def mrmr(df, y, select=100, bins=10, verbose=False):
     df = np.array(df)
     y_bins = len(np.unique(y))
