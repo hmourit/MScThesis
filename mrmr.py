@@ -45,7 +45,6 @@ if __name__ == '__main__':
         data = data[factors['source tissue'] == args.tissue]
         factors = factors[factors['source tissue'] == args.tissue]
     target = factors[args.target]
-    target = LabelEncoder().fit_transform(target)
 
     split = StratifiedShuffleSplit(target, n_iter=1, test_size=args.test_size)
     train, test = next(iter(split))
@@ -53,6 +52,7 @@ if __name__ == '__main__':
     data = data.iloc[train, :]
     target = target.iloc[train]
 
+    target = LabelEncoder().fit_transform(target)
     result['test_samples'] = test.tolist()
 
     data = ExpressionDiscretizer().fit(data).transform(data)
