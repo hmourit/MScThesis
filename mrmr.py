@@ -45,7 +45,7 @@ if __name__ == '__main__':
         data = data[factors['source tissue'] == args.tissue]
         factors = factors[factors['source tissue'] == args.tissue]
     target = factors[args.target]
-    target_num = LabelEncoder().fit_transform(target)
+    target = LabelEncoder().fit_transform(target)
 
     split = StratifiedShuffleSplit(target, n_iter=1, test_size=args.test_size)
     train, test = next(iter(split))
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     result['subsets'] = []
 
     features = []
-    for i, f in enumerate(mrmr_iter(data, target_num, select=data.shape[1], bins=3)):
+    for i, f in enumerate(mrmr_iter(data, target, select=data.shape[1], bins=3)):
         features.append(f)
         if i >= 10 and i % 10 ** int(np.log10(i)) == 0:
             result['subsets'].append({
