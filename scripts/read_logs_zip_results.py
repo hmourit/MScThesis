@@ -28,6 +28,7 @@ if __name__ == '__main__':
     for log_file in log_files:
         log_basename = os.path.basename(log_file)
         print('{0}: '.format(log_basename), end='', )
+        sys.stdout.flush()
         result_file = None
         ok = False
         error = False
