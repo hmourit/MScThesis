@@ -49,13 +49,17 @@ if __name__ == '__main__':
         job_ids = [os.path.basename(x).rstrip('.txt') for x in to_stop]
         command = ' '.join(['qdel'] + job_ids)
         print(command)
+        os.system(command)
+
         for log in to_stop:
             log_basename = os.path.basename(log)
             new_basename = 'finished_' + log_basename
-            # shutil.move(log, log.replace(log_basename, new_basename))
+            shutil.move(log, log.replace(log_basename, new_basename))
 
         for result in finished_results:
-            print('{0} -> {1}'.format(result, join(dirname(result), 'finished_mrmr')))
+            # print('{0} -> {1}'.format(result, join(dirname(result), 'finished_mrmr')))
+            shutil.move(result, join(dirname(result), 'finished_mrmr'))
+
 
         # for job_id in to_stop:
         #     log_basename = os.path.basename(logs[])
