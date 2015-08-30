@@ -2,7 +2,9 @@ from __future__ import division, print_function
 from glob import glob
 import json
 import os
+from os.path import join, dirname
 import sys
+import shutil
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
@@ -25,6 +27,7 @@ if __name__ == '__main__':
     result_files = glob(result_files)
 
     to_stop = []
+    finished_results = []
     for result in result_files:
         result_basename = os.path.basename(result)
         print('{0}:\t '.format(result_basename), end='', )
@@ -34,6 +37,7 @@ if __name__ == '__main__':
         last_subset = d['subsets'][-1]['n_features']
         if int(last_subset) >= 1000:
             to_stop.append(logs[result_basename])
+            finished_results.append(result)
 
         job_id = os.path.basename(logs[result_basename]).rstrip('.txt')
 
@@ -48,6 +52,10 @@ if __name__ == '__main__':
         for log in to_stop:
             log_basename = os.path.basename(log)
             new_basename = 'finished_' + log_basename
-            print('{0} -> {1}'.format(log, log.replace(log_basename, new_basename)))
+            # shutil.move(log, log.replace(log_basename, new_basename))
+
+        for result in finished_results:
+            print('{0} -> {1}'.format(result, join(dirname(result), 'finished_mrmr')))
+
         # for job_id in to_stop:
         #     log_basename = os.path.basename(logs[])
