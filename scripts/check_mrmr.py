@@ -12,6 +12,7 @@ if __name__ == '__main__':
     print('Retrieving JOB_IDs...')
     ids = {}
     for log in log_files:
+        print(log)
         job_id = os.path.basename(log).rstrip('.txt')
         with open(log, 'r') as f:
             for line in f:
