@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     stop = raw_input('Do you want to stop processes after 1000 features? y/[n]')
     if stop.lower() == 'y':
-        job_ids = [os.path.basename(logs[x].rstrip('.txt')) for x in to_stop]
+        job_ids = [os.path.basename(x).rstrip('.txt') for x in to_stop]
         command = ' '.join(['qdel'] + to_stop)
         print(command)
         # for job_id in to_stop:
