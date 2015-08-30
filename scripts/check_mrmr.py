@@ -1,5 +1,6 @@
 from __future__ import division, print_function
 from glob import glob
+import json
 import os
 import sys
 
@@ -12,7 +13,6 @@ if __name__ == '__main__':
     print('Retrieving JOB_IDs...')
     ids = {}
     for log in log_files:
-        print(log)
         job_id = os.path.basename(log).rstrip('.txt')
         with open(log, 'r') as f:
             for line in f:
@@ -22,18 +22,16 @@ if __name__ == '__main__':
                     ids[result_file] = job_id
                     break
 
-    for k, v in ids.items():
-        print(k, v)
+    result_files = sys.argv[1]
+    result_files = glob(result_files)
 
-    # result_files = sys.argv[1]
-    # result_files = glob(result_files)
-    #
-    #
-    #
-    #
-    # for result in result_files:
-    #     result_basename = os.path.basename(result)
-    #     print('{0}: '.format(result_basename), end='', )
-    #     sys.stdout.flush()
-    #
-    #     with open(result, 'r') as f:
+    for result in result_files:
+        result_basename = os.path.basename(result)
+        print('{0}:\t '.format(result_basename), end='', )
+        sys.stdout.flush()
+
+        d = json.load(open(result, 'r'))
+        last_subset = d['subsets'][-1]['n_features']
+
+        print('{0}\tJOB_ID: {1}'.format(last_subset, ids[result_basename]))
+        sys.stdout.flush()
