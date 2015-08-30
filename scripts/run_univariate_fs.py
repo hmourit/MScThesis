@@ -36,19 +36,19 @@ filters = ['chi2']
 clfs = ['en', 'svm_linear_kernel', 'svm_linear', 'svm_linear_l1']
 
 jobs = [
-    ('mdd_raw37', 'stress', None, 'anova', 'svm_linear_l1'),
-    ('mdd_raw37', 'stress', None, 'infogain_10', 'svm_linear_l1'),
-    ('mdd_raw37', 'stress', None, 'infogain_exp', 'svm_linear_l1'),
-    ('mdd_raw37', 'stress', None, 'infogain_exp', 'svm_linear_kernel'),
-    ('mdd_raw_37', 'drug', None, 'anova', 'en'),
-    ('mdd_raw_37', 'drug', None, 'anova', 'svm_linear_kernel'),
-    ('mdd_raw_37', 'drug', None, 'anova', 'svm_linear_l1'),
-    ('mdd_raw_37', 'drug', None, 'infogain_10', 'en'),
-    ('mdd_raw_37', 'drug', None, 'infogain_10', 'svm_linear_kernel'),
-    ('mdd_raw_37', 'drug', None, 'infogain_10', 'svm_linear_l1'),
-    ('mdd_raw_37', 'drug', None, 'infogain_exp', 'en'),
-    ('mdd_raw_37', 'drug', None, 'infogain_exp', 'svm_linear_kernel'),
-    ('mdd_raw_37', 'drug', None, 'infogain_exp', 'svm_linear_l1')
+    # ('mdd_raw37', 'stress', None, 'anova', 'svm_linear_l1'),
+    # ('mdd_raw37', 'stress', None, 'infogain_10', 'svm_linear_l1'),
+    # ('mdd_raw37', 'stress', None, 'infogain_exp', 'svm_linear_l1'),
+    # ('mdd_raw37', 'stress', None, 'infogain_exp', 'svm_linear_kernel'),
+    ('mdd_raw37', 'drug', None, 'anova', 'en'),
+    ('mdd_raw37', 'drug', None, 'anova', 'svm_linear_kernel'),
+    ('mdd_raw37', 'drug', None, 'anova', 'svm_linear_l1'),
+    ('mdd_raw37', 'drug', None, 'infogain_10', 'en'),
+    ('mdd_raw37', 'drug', None, 'infogain_10', 'svm_linear_kernel'),
+    ('mdd_raw37', 'drug', None, 'infogain_10', 'svm_linear_l1'),
+    ('mdd_raw37', 'drug', None, 'infogain_exp', 'en'),
+    ('mdd_raw37', 'drug', None, 'infogain_exp', 'svm_linear_kernel'),
+    ('mdd_raw37', 'drug', None, 'infogain_exp', 'svm_linear_l1')
 ]
 
 n_jobs = 0
