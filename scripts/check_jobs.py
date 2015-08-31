@@ -33,7 +33,7 @@ if __name__ == '__main__':
                     result_file = [x for x in line.split() if x.endswith('.json')][0].strip()
                 elif line.startswith('# OK'):
                     ok = True
-            if 'Err' in line.lower():
+            if 'err' in line.lower():
                 error = True
                 print(line)
 
