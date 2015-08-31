@@ -13,7 +13,7 @@ if __name__ == '__main__':
     OUT = '-o $HOME/bucket/logs/$JOB_ID.txt'
 
     PYTHON = 'python'
-    SCRIPT = '$HOME/MScThesis/classify_with_mrmr.py'
+    SCRIPT = '$HOME/MScThesis/eclassify_with_mrmr.py'
 
     submit_options = [CWD, JOIN, SHELL, QUEUE, NAME, OUT]
 
@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     mrmr_results_path = './bucket/results/finished_mrmr'
     results = os.listdir(mrmr_results_path)
-    results = [x for x in results if x.startswith('subsets_mrmr')]
+    results = [join(mrmr_results_path, x) for x in results if x.startswith('subsets_mrmr')]
 
     for mrmr_result in results:
         for clf in clfs:
