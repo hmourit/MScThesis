@@ -23,6 +23,7 @@ if __name__ == '__main__':
         running = False
         if job_id in running_jobs:
             running = True
+            print('Running')
 
         result_file = None
         ok = False
@@ -36,6 +37,9 @@ if __name__ == '__main__':
             if 'err' in line.lower():
                 error = True
                 print(line)
+
+        if error:
+            shutil.move(log, log.replace(basename(log), 'error_' + basename(log)))
 
         if result_file and os.path.isfile(result_file):
             try:
