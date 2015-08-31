@@ -12,14 +12,13 @@ if __name__ == '__main__':
     logs_files = [x for x in os.listdir('./bucket/logs') if re.match('^\d+\.txt', basename(x))]
 
     qstat = Popen('qstat', stdout=PIPE).communicate()[0]
-    running = [x.split()[0] for x in qstat.split('\n') if 'mouri' in x]
-    print(running)
+    running_jobs = [x.split()[0] for x in qstat.split('\n') if 'mouri' in x]
 
     for log in logs_files:
         job_id = basename(log).rstrip('.txt')
         print('### {0}'.format(job_id))
         running = False
-        if job_id in running:
+        if job_id in running_jobs:
             running = True
 
         result_file = None
