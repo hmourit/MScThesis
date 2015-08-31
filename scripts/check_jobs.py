@@ -37,16 +37,19 @@ if __name__ == '__main__':
                 error = True
                 print(line)
 
-        try:
-            _ = json.load(open(result_file, 'r'))
-        except ValueError as e:
-            print(e)
-            remove = raw_input('Do you want to archive log, remove result and stop job? y/[n]')
-            if remove.lower() == 'y':
-                if running:
-                    os.system('qdel {0}'.format(job_id))
-                shutil.move(log, log.replace(basename(log), 'error_' + basename(log)))
-                os.remove(result_file)
+        if result_file:
+            try:
+                _ = json.load(open(result_file, 'r'))
+            except ValueError as e:
+                print(e)
+                remove = raw_input('Do you want to archive log, remove result and stop job? y/[n]')
+                if remove.lower() == 'y':
+                    if running:
+                        os.system('qdel {0}'.format(job_id))
+                    shutil.move(log, log.replace(basename(log), 'error_' + basename(log)))
+                    os.remove(result_file)
+        else:
+            print('No result file found.')
 
         if not ok and not error and not running and not result_file:
             show = raw_input('Not running and nothing in the log. Show log? y/[n]')
