@@ -46,4 +46,7 @@ if __name__ == '__main__':
             os.system('qsub job.sh')
             n_jobs += 1
 
+        with open(join(mrmr_results_path, 'used.txt'), 'a') as f:
+            f.write(mrmr_result + '\n')
+
     print('# {0} jobs submitted.'.format(n_jobs))
