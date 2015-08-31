@@ -13,7 +13,7 @@ if __name__ == '__main__':
     OUT = '-o $HOME/bucket/logs/$JOB_ID.txt'
 
     PYTHON = 'python'
-    SCRIPT = '$HOME/MScThesis/eclassify_with_mrmr.py'
+    SCRIPT = '$HOME/MScThesis/classify_with_mrmr.py'
 
     submit_options = [CWD, JOIN, SHELL, QUEUE, NAME, OUT]
 
