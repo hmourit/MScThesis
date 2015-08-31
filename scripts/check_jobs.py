@@ -2,7 +2,8 @@ from __future__ import division, print_function
 import json
 import os
 from os.path import basename
-import subprocess
+from subprocess import Popen
+from subprocess import PIPE
 import re
 import shutil
 
@@ -10,7 +11,9 @@ if __name__ == '__main__':
 
     logs_files = [x for x in os.listdir('./bucket/logs') if re.match('^\d+\.txt', basename(x))]
 
-    running = [x.split()[0] for x in subprocess.check_output('qstat').split('\n') if 'mouri' in x]
+    qstat = Popen('qstat', stdout=PIPE).communicate()[0]
+    running = [x.split()[0] for x in qstat.split('\n') if 'mouri' in x]
+    print(running)
 
     for log in logs_files:
         job_id = basename(log).rstrip('.txt')
