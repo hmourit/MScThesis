@@ -3,14 +3,20 @@ import json
 from socket import gethostname
 import argparse
 from datetime import datetime
-import re
 import sys
 from os.path import join
-from sklearn.preprocessing import LabelEncoder
-from rfe2 import n_folds_parser
+
+import numpy as np
+
 from data2 import load
 from scripts.base import choose_classifier, GridWithCoef
-import numpy as np
+
+
+def n_folds_parser(x):
+    if x.lower() == 'loo':
+        return 'loo'
+    else:
+        return int(x)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

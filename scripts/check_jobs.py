@@ -37,7 +37,7 @@ if __name__ == '__main__':
                 error = True
                 print(line)
 
-        if result_file:
+        if result_file and os.path.isfile(result_file):
             try:
                 _ = json.load(open(result_file, 'r'))
             except ValueError as e:
@@ -56,7 +56,7 @@ if __name__ == '__main__':
             if show.lower() == 'y':
                 with open(log, 'r') as f:
                     for line in f:
-                        print(line)
+                        print(line.rstrip('\n'))
             archive = raw_input('Do you want to archive the log? y/[n]')
             if archive.lower() == 'y':
                 shutil.move(log, log.replace(basename(log), 'error_' + basename(log)))
