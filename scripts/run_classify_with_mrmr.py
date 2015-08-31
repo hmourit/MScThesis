@@ -13,7 +13,7 @@ if __name__ == '__main__':
     OUT = '-o $HOME/bucket/logs/$JOB_ID.txt'
 
     PYTHON = 'python'
-    SCRIPT = '$HOME/MScThesis/classify_with_mrmr.py'
+    SCRIPT = '$HOME/MScThesis/scripts/classify_with_mrmr.py'
 
     submit_options = [CWD, JOIN, SHELL, QUEUE, NAME, OUT]
 
@@ -25,6 +25,7 @@ if __name__ == '__main__':
 
     mrmr_results_path = './bucket/results/finished_mrmr'
     results = os.listdir(mrmr_results_path)
+    results = [x for x in results if x.startswith('subsets_mrmr')]
 
     for mrmr_result in results:
         for clf in clfs:
@@ -44,8 +45,5 @@ if __name__ == '__main__':
 
             os.system('qsub job.sh')
             n_jobs += 1
-
-        with open(join(mrmr_results_path, 'used.txt'), 'a') as f:
-            f.write(mrmr_result + '\n')
 
     print('# {0} jobs submitted.'.format(n_jobs))

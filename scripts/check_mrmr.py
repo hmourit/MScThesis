@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
         d = json.load(open(result, 'r'))
         last_subset = d['subsets'][-1]['n_features']
-        if int(last_subset) >= 1000:
+        if int(last_subset) >= 500:
             to_stop.append(logs[result_basename])
             finished_results.append(result)
 
@@ -44,7 +44,7 @@ if __name__ == '__main__':
         print('{0}\tJOB_ID: {1}'.format(last_subset, job_id))
         sys.stdout.flush()
 
-    stop = raw_input('Do you want to stop processes after 1000 features? y/[n]')
+    stop = raw_input('Do you want to stop processes after 500 features? y/[n]')
     if stop.lower() == 'y':
         job_ids = [os.path.basename(x).rstrip('.txt') for x in to_stop]
         command = ' '.join(['qdel'] + job_ids)
