@@ -41,6 +41,9 @@ if __name__ == '__main__':
         if error:
             shutil.move(log, log.replace(basename(log), 'error_' + basename(log)))
 
+        if ok:
+            shutil.move(log, log.replace(basename(log), 'finished_' + basename(log)))
+
         if result_file and os.path.isfile(result_file):
             try:
                 _ = json.load(open(result_file, 'r'))
