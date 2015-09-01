@@ -45,18 +45,16 @@ if __name__ == '__main__':
                 '-v'
             ]
 
-            print(command)
+            with open('job.sh', 'w') as f:
+                f.write('#!/bin/bash\n')
+                for option in submit_options:
+                    f.write('#$ ' + option + '\n')
+                f.write('\n' + ' '.join(command) + '\n')
 
-            # with open('job.sh', 'w') as f:
-            #     f.write('#!/bin/bash\n')
-            #     for option in submit_options:
-            #         f.write('#$ ' + option + '\n')
-            #     f.write('\n' + ' '.join(command) + '\n')
-            #
-            # os.system('qsub job.sh')
+            os.system('qsub job.sh')
             n_jobs += 1
 
-        # with open(join(mrmr_results_path, 'used.txt'), 'a') as f:
-        #     f.write(mrmr_result + '\n')
+        with open(join(mrmr_results_path, 'used.txt'), 'a') as f:
+            f.write(mrmr_result + '\n')
 
     print('# {0} jobs submitted.'.format(n_jobs))
