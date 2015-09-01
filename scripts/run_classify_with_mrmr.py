@@ -1,7 +1,7 @@
 from __future__ import division, print_function
 import os
 import shutil
-from os.path import join
+from os.path import join, basename
 
 if __name__ == '__main__':
     QSUB = 'qsub'
@@ -27,7 +27,15 @@ if __name__ == '__main__':
     results = os.listdir(mrmr_results_path)
     results = [join(mrmr_results_path, x) for x in results if x.startswith('subsets_mrmr')]
 
+    used = []
+    with open(join(mrmr_results_path, 'used.txt'), 'r') as f:
+        for line in f:
+            used.append(line.rstrip('\n'))
+
     for mrmr_result in results:
+        if basename(mrmr_result) in used:
+            print('{0} already used'.format(basename(mrmr_result)))
+            continue
         for clf in clfs:
             command = [
                 PYTHON, SCRIPT,
@@ -37,16 +45,18 @@ if __name__ == '__main__':
                 '-v'
             ]
 
-            with open('job.sh', 'w') as f:
-                f.write('#!/bin/bash\n')
-                for option in submit_options:
-                    f.write('#$ ' + option + '\n')
-                f.write('\n' + ' '.join(command) + '\n')
+            print(command)
 
-            os.system('qsub job.sh')
+            # with open('job.sh', 'w') as f:
+            #     f.write('#!/bin/bash\n')
+            #     for option in submit_options:
+            #         f.write('#$ ' + option + '\n')
+            #     f.write('\n' + ' '.join(command) + '\n')
+            #
+            # os.system('qsub job.sh')
             n_jobs += 1
 
-        with open(join(mrmr_results_path, 'used.txt'), 'a') as f:
-            f.write(mrmr_result + '\n')
+        # with open(join(mrmr_results_path, 'used.txt'), 'a') as f:
+        #     f.write(mrmr_result + '\n')
 
     print('# {0} jobs submitted.'.format(n_jobs))
