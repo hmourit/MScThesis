@@ -33,7 +33,7 @@ if __name__ == '__main__':
             used.append(line.rstrip('\n'))
 
     for mrmr_result in results:
-        if basename(mrmr_result) in used:
+        if mrmr_result in used:
             print('{0} already used'.format(basename(mrmr_result)))
             continue
         for clf in clfs:
