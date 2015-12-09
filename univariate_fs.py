@@ -34,6 +34,7 @@ def main():
     parser.add_argument('--n-folds', default=10, type=n_folds_parser)
     parser.add_argument('--clf')
     parser.add_argument('--filter', default='anova')
+    parser.add_argument('--classes', default='all')
     args = parser.parse_args()
 
     result = {}
@@ -55,6 +56,10 @@ def main():
     if args.tissue:
         data = data[factors['source tissue'] == args.tissue]
         factors = factors[factors['source tissue'] == args.tissue]
+    if args.classes != 'all':
+        classes = args.classes.split(',')
+        data = data[factors[args.target].isin(classes)]
+        factors = factors[factors[args.target].isin(classes)]
     target = factors[args.target]
     target_num = LabelEncoder().fit_transform(target)
 
